@@ -1,0 +1,14 @@
+{
+  "name": "sets-game-engine",
+  "version": "0.0.0",
+  "description": "Sets the game engine.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Maurice Prosper",
+    "email": "mothepro@live.com"
+  },
+  "license": "ISC"
+}
