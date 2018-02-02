@@ -4,11 +4,18 @@
   "description": "Sets the game engine.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": {
     "name": "Maurice Prosper",
     "email": "mothepro@live.com"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@types/mocha": "^2.2.48",
+    "@types/should": "^13.0.0",
+    "mocha": "^5.0.0",
+    "should": "^13.2.1",
+    "shuffle-array": "^1.0.1"
+  }
 }
