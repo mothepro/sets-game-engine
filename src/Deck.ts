@@ -1,5 +1,5 @@
 import Card, {Quantity, Opacity, Shape, Color} from './Card'
-import shuffle from 'shuffle-array'
+import * as shuffle from 'shuffle-array'
 
 export default class Deck {
     private cards: Card[] = []
