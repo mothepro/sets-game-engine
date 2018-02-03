@@ -1,32 +1,24 @@
-
 export const enum Color { BLUE, RED, GREEN }
 export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
 export const enum Quantity { ONE, TWO, THREE }
 export const enum Opacity { SOLID, HALF, EMPTY }
 
-export interface CardDetails {
-    color: Color
-    shape: Shape
-    quantity: Quantity
-    opacity: Opacity
-}
-
 export default class Card {
     /**
      * The max number of elements in a particular detail.
      */
-    static readonly DETAILS_SIZE = 3
+    public static readonly DETAILS_SIZE = 3
 
     /**
      * The total number of details per card.
      */
-    static readonly DETAILS_COUNT = 4
+    public static readonly DETAILS_COUNT = 4
 
     /**
      * Number of total different combinations of cards.
      * the max # of options for each detail raised to the # of details.
      */
-    static readonly COMBINATIONS = Card.DETAILS_SIZE ** Card.DETAILS_COUNT
+    public static readonly COMBINATIONS = Card.DETAILS_SIZE ** Card.DETAILS_COUNT
 
     constructor(
         public readonly color: Color,
@@ -74,12 +66,12 @@ export default class Card {
      *
      * @param {number} encoding Number between 0 and total combinations
      */
-    static make(encoding: number): Card {
+    public static make(encoding: number): Card {
         return new Card(
-            Math.floor(encoding / Card.DETAILS_SIZE ** 0) % Card.DETAILS_SIZE as Color,
-            Math.floor(encoding / Card.DETAILS_SIZE ** 1) % Card.DETAILS_SIZE as Shape,
-            Math.floor(encoding / Card.DETAILS_SIZE ** 2) % Card.DETAILS_SIZE as Quantity,
-            Math.floor(encoding / Card.DETAILS_SIZE ** 3) % Card.DETAILS_SIZE as Opacity,
+            Math.trunc(encoding / Card.DETAILS_SIZE ** 0) % Card.DETAILS_SIZE as Color,
+            Math.trunc(encoding / Card.DETAILS_SIZE ** 1) % Card.DETAILS_SIZE as Shape,
+            Math.trunc(encoding / Card.DETAILS_SIZE ** 2) % Card.DETAILS_SIZE as Quantity,
+            Math.trunc(encoding / Card.DETAILS_SIZE ** 3) % Card.DETAILS_SIZE as Opacity,
         )
     }
 }
