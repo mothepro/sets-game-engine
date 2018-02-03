@@ -67,11 +67,12 @@ export default class Card {
      * O(n**3) *GASP*
      */
     public static hasSet(cards: Card[]): boolean {
-        for(let i = 0; i < cards.length; i++)
-            for(let j = i + 1; j < cards.length; j++)
-                for(let k = j + 1; k < cards.length; k++)
-                    if(Card.isSet(cards[i], cards[j], cards[k]))
-                        return true
+        if(cards.length >= 3)
+            for(let i = 0; i < cards.length; i++)
+                for(let j = i + 1; j < cards.length; j++)
+                    for(let k = j + 1; k < cards.length; k++)
+                        if(Card.isSet(cards[i], cards[j], cards[k]))
+                            return true
         return false
     }
 

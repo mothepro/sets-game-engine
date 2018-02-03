@@ -111,5 +111,13 @@ describe('Card', () => {
             ]).should.be.false()
             done()
         })
+
+        it('one pair', done => {
+            Card.hasSet([
+                new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
+                new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
+            ]).should.be.false()
+            done()
+        })
     })
 })
