@@ -3,7 +3,11 @@
     "module": "commonjs",
     "target": "es5",
     "strict": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "dist/",
+    "declaration": true,
+    "downlevelIteration": true,
+    "lib": ["esnext"]
   },
   "exclude": [
     "node_modules"
