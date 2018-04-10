@@ -15,15 +15,25 @@ describe('Deck', () => {
             MutableDeck.MARKET_SIZE + MutableDeck.MARKET_INC,
             MutableDeck.MARKET_SIZE + MutableDeck.MARKET_INC + MutableDeck.MARKET_INC,
         )
+        deck.isDone().should.be.false()
         done()
     })
 
-    it('Market should fill up all the way because a set can\'t be made.', done => {
+    it('Market should fill up all the way because a set can\'t be made', done => {
         const deck = new MutableDeck
         deck.setCards(CardsWithoutSet)
         deck.market.should.be.empty()
         deck.makeMarket()
         deck.market.length.should.be.equal(CardsWithoutSet.length)
+        deck.isDone().should.be.true()
+        done()
+    })
+
+    it('Deck should be complete', done => {
+        const deck = new MutableDeck
+        deck.isDone().should.be.false()
+        deck.clearCards()
+        deck.isDone().should.be.true()
         done()
     })
 })

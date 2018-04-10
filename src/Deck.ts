@@ -34,4 +34,9 @@ export default class Deck {
                 this.market.push(this.cards.pop()!)
         }
     }
+
+    /** Whether any more sets can be made. */
+    public isDone(): boolean {
+        return this.cards.length === 0 && !Card.hasSet(this.market)
+    }
 }
