@@ -2,6 +2,7 @@ export const enum Color { BLUE, RED, GREEN }
 export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
 export const enum Quantity { ONE, TWO, THREE }
 export const enum Opacity { SOLID, HALF, EMPTY }
+export type Set = [Card, Card, Card]
 
 export default class Card {
     /**
@@ -53,11 +54,16 @@ export default class Card {
     /**
      * Whether 3 cards make a set.
      */
-    public static isSet(card1: Card, card2: Card, card3: Card): boolean {
-        const first = Card.diff(card1, card2)
+    static isSet(card1: Card, card2: Card, card3: Card): boolean
+    static isSet(cards: Set): boolean
+    public static isSet(cardORset: Card | Set, card2?: Card, card3?: Card): boolean {
+        if(Array.isArray(cardORset))
+            return Card.isSet(cardORset[0], cardORset[1], cardORset[2])
+
+        const first = Card.diff(cardORset, card2!)
         return [
-            Card.diff(card2, card3),
-            Card.diff(card3, card1),
+            Card.diff(card2!, card3!),
+            Card.diff(card3!, cardORset),
         ].every(diff => diff === first)
     }
 
