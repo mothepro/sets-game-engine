@@ -2,17 +2,15 @@ export const enum Color { BLUE, RED, GREEN }
 export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
 export const enum Quantity { ONE, TWO, THREE }
 export const enum Opacity { SOLID, HALF, EMPTY }
+
 export type Set = [Card, Card, Card]
+export type SetIndexs = [number, number, number] // Accessing a Set through its indices.
 
 export default class Card {
-    /**
-     * The max number of elements in a particular detail.
-     */
+    /** The max number of elements in a particular detail. */
     public static readonly DETAILS_SIZE = 3
 
-    /**
-     * The total number of details per card.
-     */
+    /** The total number of details per card. */
     public static readonly DETAILS_COUNT = 4
 
     /**
@@ -41,9 +39,7 @@ export default class Card {
             this.opacity    * Card.DETAILS_SIZE ** 3
     }
 
-    /**
-     * A unique value comparing the difference in the card's details.
-     */
+    /** A unique value comparing the difference in the card's details. */
     protected static diff(card1: Card, card2: Card): number {
         return +(card1.color === card2.color)       << 0 |
             +(card1.shape === card2.shape)          << 1 |
@@ -51,33 +47,22 @@ export default class Card {
             +(card1.opacity === card2.opacity)      << 3
     }
 
-    /**
-     * Whether 3 cards make a set.
-     */
-    static isSet(card1: Card, card2: Card, card3: Card): boolean
-    static isSet(cards: Set): boolean
-    public static isSet(cardORset: Card | Set, card2?: Card, card3?: Card): boolean {
-        if(Array.isArray(cardORset))
-            return Card.isSet(cardORset[0], cardORset[1], cardORset[2])
-
-        const first = Card.diff(cardORset, card2!)
+    /** Whether 3 cards make a set. */
+    public static isSet(cards: Set): boolean {
+        const first = Card.diff(cards[0], cards[1])
         return [
-            Card.diff(card2!, card3!),
-            Card.diff(card3!, cardORset),
+            Card.diff(cards[1], cards[2]),
+            Card.diff(cards[2], cards[0]),
         ].every(diff => diff === first)
     }
 
-    /**
-     * Whether a group of cards can make a set.
-     *
-     * O(n**3) *GASP*
-     */
+    /** Whether a group of cards can make a set. ~~ O(n**3) ~~ */
     public static hasSet(cards: Card[]): boolean {
         if(cards.length >= 3)
             for(let i = 0; i < cards.length; i++)
                 for(let j = i + 1; j < cards.length; j++)
                     for(let k = j + 1; k < cards.length; k++)
-                        if(Card.isSet(cards[i], cards[j], cards[k]))
+                        if(Card.isSet([cards[i], cards[j], cards[k]]))
                             return true
         return false
     }
