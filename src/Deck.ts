@@ -1,4 +1,4 @@
-import Card from './Card'
+import Card, {Set, SetIndexs} from './Card'
 import * as shuffle from 'shuffle-array'
 
 export default class Deck {
@@ -31,12 +31,26 @@ export default class Deck {
             )
         ) {
             for(let i = 0; i < Math.min(Deck.MARKET_INC, this.cards.length); i++)
-                this.market.push(this.cards.pop()!)
+                this.market.push(this.cards.shift()!)
         }
     }
 
     /** Whether any more sets can be made. */
     public isDone(): boolean {
         return this.cards.length === 0 && !Card.hasSet(this.market)
+    }
+
+    /** Pops a Set from the Market. */
+    public removeSet(indexs: SetIndexs): Set {
+        const ret = []
+        for(const index of indexs) {
+            ret.push(this.market[index])
+            delete this.market[index]
+        }
+
+        // remove non cards
+        this.market = this.market.filter(card => card instanceof Card)
+
+        return ret as Set
     }
 }
