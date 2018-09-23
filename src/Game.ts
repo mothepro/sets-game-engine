@@ -33,8 +33,10 @@ export default class Game {
 
     /** Adds a new player to the game before starting. */
     public addPlayer(player: Player): this {
-        if (!this.inProgress)
-            this.players.add(player.setGame(this))
+        if (!this.inProgress) {
+            player.game = this
+            this.players.add(player)
+        }
         return this
     }
 

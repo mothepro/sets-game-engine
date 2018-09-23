@@ -2,7 +2,7 @@ import {Set} from './Card'
 import Game from './Game'
 
 export default abstract class Player {
-    private game!: Game
+    public game!: Game
 
     /** Sets taken from the Game. */
     public readonly sets: Set.Cards[] = []
@@ -23,11 +23,6 @@ export default abstract class Player {
 
     public get isTimedout(): boolean {
         return this.banned
-    }
-
-    public setGame(game: Game): this {
-        this.game = game
-        return this
     }
 
     /** If possible, move a set from the market to a player. */
