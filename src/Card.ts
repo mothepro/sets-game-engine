@@ -3,8 +3,10 @@ export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
 export const enum Quantity { ONE, TWO, THREE }
 export const enum Opacity { SOLID, HALF, EMPTY }
 
-export type Set = [Card, Card, Card]
-export type SetIndexs = [number, number, number] // Accessing a Set through its indices.
+export namespace Set {
+    export type Cards = [Card, Card, Card]
+    export type Indexs = [number, number, number] // Accessing a Set through its indices.
+}
 
 export default class Card {
     /** The max number of elements in a particular detail. */
@@ -48,7 +50,7 @@ export default class Card {
     }
 
     /** Whether 3 cards make a set. */
-    public static isSet(cards: Set): boolean {
+    public static isSet(...cards: Set.Cards): boolean {
         const first = Card.diff(cards[0], cards[1])
         return [
             Card.diff(cards[1], cards[2]),
@@ -62,7 +64,7 @@ export default class Card {
             for(let i = 0; i < cards.length; i++)
                 for(let j = i + 1; j < cards.length; j++)
                     for(let k = j + 1; k < cards.length; k++)
-                        if(Card.isSet([cards[i], cards[j], cards[k]]))
+                        if(Card.isSet(cards[i], cards[j], cards[k]))
                             return true
         return false
     }
