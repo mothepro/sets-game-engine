@@ -5,7 +5,7 @@ import * as shuffle from 'shuffle-array'
 
 // TODO: Emit Events.
 export default class Game {
-    private readonly players: Player[] = []
+    private readonly players: Set<Player> = new Set
 
     /** Playable cards. */
     protected cards: Card[] = []
@@ -33,10 +33,8 @@ export default class Game {
 
     /** Adds a new player to the game before starting. */
     public addPlayer(player: Player): this {
-        if (!this.inProgress) {
-            player.game = this
-            this.players.push(player)
-        }
+        if (!this.inProgress)
+            this.players.add(player.setGame(this))
         return this
     }
 
@@ -48,10 +46,8 @@ export default class Game {
     /** Currently winning players. */
     public getWinners(): Player[] {
         const winners = []
-        const maxSets = this.players.reduce(
-            (maxScore, player) => Math.max(maxScore, player.score),
-            this.players[0].score
-        )
+        const maxSets = [...this.players].reduce(
+            (maxScore, player) => Math.max(maxScore, player.score), 0)
         for(const player of this.players)
             if(player.score == maxSets)
                 winners.push(player)
