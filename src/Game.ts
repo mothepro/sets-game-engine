@@ -84,7 +84,7 @@ export default class Game
     /** Whether a set of cards in the market is valid to take. */
     public checkSet(...indexs: Set.Indexs): boolean {
         return Card.isSet(...this.market.cards.filter(
-            (_, index) => indexs.includes(index)) as Set.Cards)
+            (_, index) => indexs.indexOf(index) !== -1) as Set.Cards)
     }
 
     /** Returns and removes some cards from the market. Updates market. */
