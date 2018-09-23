@@ -52,11 +52,11 @@ export default abstract class Player
     /** Bans the player from taking any sets. */
     private ban() {
         this.banned = true
+        this.emit('banned', this.timeout)
         setTimeout(() => {
             this.banned = false
             this.timeout += this.timeoutIncrease
             this.emit('unbanned')
         }, this.timeout)
-        this.emit('banned', this.timeout)
     }
 }
