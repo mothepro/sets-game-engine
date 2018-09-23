@@ -1,7 +1,7 @@
-import Deck from '../../src/Deck'
 import Card from '../../src/Card'
+import Game from '../../src/Game'
 
-export default class MutableDeck extends Deck {
+export default class MutableGame extends Game {
     public static readonly MARKET_SIZE = 9
     public static readonly MARKET_INC = 3
 
@@ -27,7 +27,7 @@ export default class MutableDeck extends Deck {
 
 describe('Test Helpers', () => {
     it('Mutable Deck', done => {
-        const deck = new MutableDeck
+        const deck = new MutableGame
         deck.getCards().length.should.equal(Card.COMBINATIONS)
 
         deck.clearCards()
