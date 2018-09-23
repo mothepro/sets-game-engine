@@ -1,9 +1,14 @@
 import Card from '../../src/Card'
 import Game from '../../src/Game'
+import Market from '../../src/Market'
 
 export default class MutableGame extends Game {
     public static readonly MARKET_SIZE = 9
     public static readonly MARKET_INC = 3
+
+    getMarket(): Market {
+        return this.market
+    }
 
     public prependCard(card: Card): this {
         this.cards.unshift(card)

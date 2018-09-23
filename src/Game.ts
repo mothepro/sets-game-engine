@@ -2,21 +2,34 @@ import Market from './Market'
 import Player from './Player'
 import Card, {Set} from './Card'
 import * as shuffle from 'shuffle-array'
+import StrictEventEmitter from 'strict-event-emitter-types'
+import { EventEmitter } from 'events'
 
-// TODO: Emit Events.
-export default class Game {
+export interface Events {
+    start: void,
+    finish: void,
+    playerBanned: (p: Player, time: number) => void,
+    playerUnbanned: Player,
+    playerAdded: Player,
+    marketFilled: void,
+    marketGrab: Set.Cards
+}
+
+export default class Game
+    extends (EventEmitter as { new(): StrictEventEmitter<EventEmitter, Events>}) {
     private readonly players: Set<Player> = new Set
 
     /** Playable cards. */
     protected cards: Card[] = []
 
     /** The cards shown the players. */
-    public market = new Market
+    protected market = new Market
 
     /** Whether the game is started and currently being played.*/
-    private inProgress = false
+    protected inProgress = false
 
     constructor({shoe = 1} = {}) {
+        super()
         for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards)
@@ -31,17 +44,29 @@ export default class Game {
         return this.isDeckEmpty && !this.market.isPlayable
     }
 
+    get unplayableCards(): number {
+        return this.cards.length
+    }
+
+    get playableCards(): ReadonlyArray<Card> {
+        return this.market.cards
+    }
+
     /** Adds a new player to the game before starting. */
     public addPlayer(player: Player): this {
         if (!this.inProgress) {
             player.game = this
+            player.on('banned', timeout => this.emit('playerBanned', player, timeout))
+            player.on('unbanned', () => this.emit('playerUnbanned', player))
             this.players.add(player)
+            this.emit('playerAdded', player)
         }
         return this
     }
 
     /** Ready up. */
     public start() {
+        this.emit('start')
         this.fillMarket()
     }
 
@@ -65,6 +90,7 @@ export default class Game {
     /** Returns and removes some cards from the market. Updates market. */
     public removeSet(...indexs: Set.Indexs): Set.Cards {
         const ret = this.market.popSet(...indexs)
+        this.emit('marketGrab', ret)
         this.fillMarket()
         return ret
     }
@@ -74,5 +100,6 @@ export default class Game {
         while (this.cards.length && !this.market.isFull)
             this.market.pushCards(...this.cards.splice(0, 3) as Set.Cards)
         this.inProgress = !this.isDone
+        this.emit(this.isDone ? 'finish' : 'marketFilled')
     }
 }
