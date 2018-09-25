@@ -1,15 +1,7 @@
 import {Set} from './Card'
 import Game from './Game'
-import StrictEventEmitter from 'strict-event-emitter-types'
-import { EventEmitter } from 'events'
 
-export interface Events {
-    banned: number,
-    unbanned: void,
-}
-
-export default abstract class Player
-    extends (EventEmitter as { new(): StrictEventEmitter<EventEmitter, Events>}) {
+export default abstract class Player {
     public game!: Game
 
     /** Sets taken from the Game. */
@@ -22,7 +14,7 @@ export default abstract class Player
         public readonly name: string,
         public timeout: number = 1000,
         public timeoutIncrease: number = 0,
-    ) { super() }
+    ) {}
 
     /** Number of collected Sets. */
     public get score(): number {
@@ -52,11 +44,11 @@ export default abstract class Player
     /** Bans the player from taking any sets. */
     private ban() {
         this.banned = true
-        this.emit('banned', this.timeout)
+        this.game.emit('playerBanned', this, this.timeout)
         setTimeout(() => {
             this.banned = false
             this.timeout += this.timeoutIncrease
-            this.emit('unbanned')
+            this.game.emit('playerUnbanned', this)
         }, this.timeout)
     }
 }

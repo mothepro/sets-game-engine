@@ -56,8 +56,6 @@ export default class Game
     public addPlayer(player: Player): this {
         if (!this.inProgress) {
             player.game = this
-            player.on('banned', timeout => this.emit('playerBanned', player, timeout))
-            player.on('unbanned', () => this.emit('playerUnbanned', player))
             this.players.add(player)
             this.emit('playerAdded', player)
         }
