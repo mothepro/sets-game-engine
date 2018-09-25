@@ -17,7 +17,7 @@ export interface Events {
 
 export default class Game
     extends (EventEmitter as { new(): StrictEventEmitter<EventEmitter, Events>}) {
-    private readonly players: Set<Player> = new Set
+    private players_: Set<Player> = new Set
 
     /** Playable cards. */
     protected cards: Card[] = []
@@ -52,11 +52,15 @@ export default class Game
         return this.market.cards
     }
 
+    get players(): ReadonlyArray<Player> {
+        return [...this.players_]
+    }
+
     /** Adds a new player to the game before starting. */
     public addPlayer(player: Player): this {
         if (!this.inProgress) {
             player.game = this
-            this.players.add(player)
+            this.players_.add(player)
             this.emit('playerAdded', player)
         }
         return this
@@ -71,10 +75,10 @@ export default class Game
     /** Currently winning players. */
     public getWinners(): Player[] {
         const winners = []
-        const maxSets = [...this.players].reduce(
+        const maxScore = this.players.reduce(
             (maxScore, player) => Math.max(maxScore, player.score), 0)
         for(const player of this.players)
-            if(player.score == maxSets)
+            if(player.score == maxScore)
                 winners.push(player)
         return winners
     }
@@ -98,6 +102,6 @@ export default class Game
         while (this.cards.length && !this.market.isFull)
             this.market.pushCards(...this.cards.splice(0, 3) as Set.Cards)
         this.inProgress = !this.isDone
-        this.emit(this.isDone ? 'finish' : 'marketFilled')
+        this.emit(this.inProgress ? 'marketFilled' : 'finish')
     }
 }

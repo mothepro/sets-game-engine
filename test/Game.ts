@@ -105,12 +105,14 @@ describe('Players', () => {
         player.takeSet(1, 2, 3)
 
         // valid, but banned
-        player.on('banned', () => {
+        game.on('playerBanned', (bannedPlayer, timeout) => {
+            player.should.eql(bannedPlayer)
             player.takeSet(1, 3, 6).should.eql(false)
             player.score.should.eql(0)
         })
 
-        player.on('unbanned', () => {
+        game.on('playerUnbanned', (unbannedPlayer) => {
+            player.should.eql(unbannedPlayer)
             player.takeSet(1, 3, 6).should.eql(true)
             player.score.should.eql(1)
             done()
