@@ -1,9 +1,9 @@
 import Market from './Market'
 import Player from './Player'
 import Card, {Set} from './Card'
-import * as shuffle from 'shuffle-array'
 import StrictEventEmitter from 'strict-event-emitter-types'
 import { EventEmitter } from 'events'
+import { shuffle } from './util'
 
 export interface Events {
     start: void,

@@ -18,7 +18,7 @@ export default class Market {
         return this.isPlayable && this.cards_.length >= Market.SIZE
     }
 
-    /** Pushes new cards_ into the market. */
+    /** Pushes new cards into the market. */
     public pushCards(...cards: Set.Cards) {
         this.cards_.push(...cards)
     }
