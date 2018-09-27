@@ -15,15 +15,21 @@ export interface Events {
     marketGrab: Set.Cards
 }
 
+export interface State {
+    readonly cards: ReadonlyArray<Card>,
+    readonly market: Market,
+    readonly players: ReadonlyArray<Player>,
+}
+
 export default class Game
     extends (EventEmitter as { new(): StrictEventEmitter<EventEmitter, Events>}) {
-    private players_: Set<Player> = new Set
+    private readonly players_: Set<Player> = new Set
 
     /** Playable cards. */
-    protected cards: Card[] = []
+    protected readonly cards: Card[] = []
 
     /** The cards shown the players. */
-    protected market = new Market
+    protected readonly market = new Market
 
     /** Whether the game is started and currently being played.*/
     protected inProgress = false
@@ -52,8 +58,34 @@ export default class Game
         return this.market.cards
     }
 
-    get players(): ReadonlyArray<Player> {
+    get maxScore(): number {
+        return this.players.reduce((maxScore, player) => Math.max(maxScore, player.score), 0)
+    }
+
+    get players(): Player[] {
         return [...this.players_]
+    }
+
+    /** Currently winning players. */
+    get winners(): Player[] {
+        return this.players.filter(player => player.score == this.maxScore)
+    }
+
+    get state(): State {
+        return {
+            cards: this.cards,
+            market: this.market,
+            players: this.players as Player[],
+        }
+    }
+
+    public setCards(cards: Card[] | number[]) {
+        if (this.inProgress)
+            throw Error('Can not load cards into a game in progress')
+
+        this.cards.length = 0
+        for (let card of cards)
+            this.cards.push(typeof card === 'number' ? Card.make(card) : card)
     }
 
     /** Adds a new player to the game before starting. */
@@ -70,17 +102,6 @@ export default class Game
     public start() {
         this.emit('start')
         this.fillMarket()
-    }
-
-    /** Currently winning players. */
-    public getWinners(): Player[] {
-        const winners = []
-        const maxScore = this.players.reduce(
-            (maxScore, player) => Math.max(maxScore, player.score), 0)
-        for(const player of this.players)
-            if(player.score == maxScore)
-                winners.push(player)
-        return winners
     }
 
     /** Whether a set of cards in the market is valid to take. */

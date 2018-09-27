@@ -5,7 +5,7 @@ import Card, {Color, Opacity, Quantity, Shape} from '../src/Card'
 import Player from '../src/Player'
 
 describe('Game\'s Deck', () => {
-    it('Market should fill up normally', done => {
+    it('Market should fill up normally', () => {
         const game = new MutableGame
 
         game.playableCards.length.should.equal(0)
@@ -17,28 +17,25 @@ describe('Game\'s Deck', () => {
             MutableGame.MARKET_SIZE + MutableGame.MARKET_INC + MutableGame.MARKET_INC,
         )
         game.isDone.should.be.false()
-        done()
     })
 
-    it('Market should fill up all the way because a set can\'t be made', done => {
+    it('Market should fill up all the way because a set can\'t be made', () => {
         const game = new MutableGame
         game.setCards(CardsWithoutSet)
         game.playableCards.should.be.empty()
         game.start()
         game.playableCards.length.should.be.equal(CardsWithoutSet.length)
         game.isDone.should.be.true()
-        done()
     })
 
-    it('Deck should be complete', done => {
+    it('Deck should be complete', () => {
         const game = new MutableGame
         game.isDone.should.be.false()
-        game.clearCards()
+        game.setCards([])
         game.isDone.should.be.true()
-        done()
     })
 
-    it('Should remove cards and keep order', done => {
+    it('Should remove cards and keep order', () => {
         const game = new MutableGame
         const card1 = Card.make(1)
         const card2 = Card.make(2)
@@ -52,7 +49,8 @@ describe('Game\'s Deck', () => {
             Card.make(5),
             card3,
             Card.make(5),
-        ]).start()
+        ])
+        game.start()
 
         game.playableCards.length.should.eql(8)
 
@@ -65,14 +63,13 @@ describe('Game\'s Deck', () => {
         game.playableCards.length.should.eql(5)
         for(const card of game.playableCards)
             card.encoding.should.eql(5)
-        done()
     })
 })
 
 describe('Players', () => {
     it('should ban', done => {
-        let game = new MutableGame
-        let player = new Player
+        const game = new MutableGame
+        const player = new Player
         game.addPlayer(player)
 
         game.on('playerBanned', (player, timeout) => {
@@ -86,9 +83,10 @@ describe('Players', () => {
         while(player.takeSet(1, 2, 3));
     })
 
-    it('should not be able to play during ban', done => {
-        let game = new MutableGame
-        let player = new Player
+    it('should get the winners', () => {
+        const game = new MutableGame
+        const player1 = new Player
+        const player2 = new Player
 
         game.setCards([
             Card.make(5),
@@ -99,7 +97,45 @@ describe('Players', () => {
             Card.make(5),
             new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
             Card.make(5),
-        ]).addPlayer(player).start()
+            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
+            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
+            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
+        ])
+        game.addPlayer(player1).addPlayer(player2).start()
+
+        game.maxScore.should.eql(0)
+        game.winners.should.containEql(player1)
+        game.winners.should.containEql(player2)
+
+        player2.takeSet(1, 3, 6)
+
+        game.maxScore.should.eql(1)
+        game.winners.length.should.eql(1)
+        game.winners.should.containEql(player2)
+
+        player1.takeSet(5, 6, 7)
+
+        game.maxScore.should.eql(1)
+        game.winners.length.should.eql(2)
+        game.winners.should.containEql(player1)
+        game.winners.should.containEql(player2)
+    })
+
+    it('should not be able to play during ban', done => {
+        const game = new MutableGame
+        const player = new Player
+
+        game.setCards([
+            Card.make(5),
+            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
+            Card.make(5),
+            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
+            Card.make(5),
+            Card.make(5),
+            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
+            Card.make(5),
+        ])
+        game.addPlayer(player).start()
 
         // invalid
         player.takeSet(1, 2, 3)

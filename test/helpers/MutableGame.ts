@@ -15,18 +15,8 @@ export default class MutableGame extends Game {
         return this
     }
 
-    public clearCards(): this {
-        this.cards = []
-        return this
-    }
-
     public getCards(): Card[] {
         return this.cards
-    }
-
-    public setCards(cards: Card[]): this {
-        this.cards = [...cards]
-        return this
     }
 }
 
@@ -35,7 +25,7 @@ describe('Test Helpers', () => {
         const deck = new MutableGame
         deck.getCards().length.should.equal(Card.COMBINATIONS)
 
-        deck.clearCards()
+        deck.setCards([])
         deck.getCards().length.should.equal(0)
 
         for(let i = 0; i < 5; i++)
