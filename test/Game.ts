@@ -69,7 +69,7 @@ describe('Game\'s Deck', () => {
 describe('Players', () => {
     it('should ban', done => {
         const game = new MutableGame
-        const player = new Player
+        const player = new Player(0)
         game.addPlayer(player)
 
         game.on('playerBanned', (player, timeout) => {
@@ -85,8 +85,8 @@ describe('Players', () => {
 
     it('should get the winners', () => {
         const game = new MutableGame
-        const player1 = new Player
-        const player2 = new Player
+        const player1 = new Player(0)
+        const player2 = new Player(0)
 
         game.setCards([
             Card.make(5),
@@ -123,7 +123,7 @@ describe('Players', () => {
 
     it('should not be able to play during ban', done => {
         const game = new MutableGame
-        const player = new Player
+        const player = new Player(0)
 
         game.setCards([
             Card.make(5),
