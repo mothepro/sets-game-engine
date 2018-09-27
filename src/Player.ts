@@ -1,7 +1,7 @@
 import {Set} from './Card'
 import Game from './Game'
 
-export default abstract class Player {
+export default class Player {
     public game!: Game
 
     /** Sets taken from the Game. */
@@ -11,7 +11,6 @@ export default abstract class Player {
     private banned = false
 
     constructor(
-        public readonly name: string,
         public timeout: number = 1000,
         public timeoutIncrease: number = 0,
     ) {}

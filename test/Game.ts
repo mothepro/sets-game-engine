@@ -2,7 +2,7 @@ import 'should'
 import MutableGame from './helpers/MutableGame'
 import CardsWithoutSet from './helpers/CardsWithoutSet'
 import Card, {Color, Opacity, Quantity, Shape} from '../src/Card'
-import RealPlayer from './helpers/RealPlayer'
+import Player from '../src/Player'
 
 describe('Game\'s Deck', () => {
     it('Market should fill up normally', done => {
@@ -72,7 +72,7 @@ describe('Game\'s Deck', () => {
 describe('Players', () => {
     it('should ban', done => {
         let game = new MutableGame
-        let player = new RealPlayer
+        let player = new Player
         game.addPlayer(player)
 
         game.on('playerBanned', (player, timeout) => {
@@ -88,7 +88,7 @@ describe('Players', () => {
 
     it('should not be able to play during ban', done => {
         let game = new MutableGame
-        let player = new RealPlayer
+        let player = new Player
 
         game.setCards([
             Card.make(5),
