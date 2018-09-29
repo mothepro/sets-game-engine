@@ -1,8 +1,16 @@
 import 'should'
-import MutableGame from './helpers/MutableGame'
 import CardsWithoutSet from './helpers/CardsWithoutSet'
 import Card, {Color, Opacity, Quantity, Shape} from '../src/Card'
 import Player from '../src/Player'
+import Game from '../src/Game'
+
+const MARKET_SIZE = 9 // Default number of cards on screen
+const MARKET_INC = 3  // Size of Set
+class MutableGame extends Game {
+    public get theMarket() {
+        return this.market
+    }
+}
 
 describe('Game\'s Deck', () => {
     it('Market should fill up normally', () => {
@@ -12,9 +20,9 @@ describe('Game\'s Deck', () => {
         game.start()
 
         game.playableCards.length.should.be.oneOf(
-            MutableGame.MARKET_SIZE,
-            MutableGame.MARKET_SIZE + MutableGame.MARKET_INC,
-            MutableGame.MARKET_SIZE + MutableGame.MARKET_INC + MutableGame.MARKET_INC,
+            MARKET_SIZE,
+            MARKET_SIZE + MARKET_INC,
+            MARKET_SIZE + MARKET_INC + MARKET_INC,
         )
         game.isDone.should.be.false()
     })
@@ -54,7 +62,7 @@ describe('Game\'s Deck', () => {
 
         game.playableCards.length.should.eql(8)
 
-        const removedCards = game.getMarket().popSet(1, 3, 6)
+        const removedCards = game.theMarket.popSet(1, 3, 6)
 
         removedCards.length.should.eql(3)
         removedCards.should.containEql(card1)

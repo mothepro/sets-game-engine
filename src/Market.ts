@@ -18,12 +18,10 @@ export default class Market {
         return this.isPlayable && this.cards_.length >= Market.SIZE
     }
 
-    /** Pushes new cards into the market. */
     public pushCards(...cards: Set.Cards) {
         this.cards_.push(...cards)
     }
 
-    /** Pops a Set from the Market. */
     public popSet(...indexs: Set.Indexs): Set.Cards {
         const ret = []
         for(const index of indexs) {
