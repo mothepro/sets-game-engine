@@ -34,11 +34,14 @@ export default class Game
     /** Whether the game is started and currently being played.*/
     protected inProgress = false
 
-    constructor({shoe = 1} = {}) {
+    constructor({
+      shoe = 1,
+      rng = (max: number) => (Math.random() * max) >>> 0
+    } = {}) {
         super()
         for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
             this.cards.push(Card.make(i))
-        shuffle(this.cards)
+        shuffle(this.cards, rng)
     }
 
     get isDeckEmpty(): boolean {
