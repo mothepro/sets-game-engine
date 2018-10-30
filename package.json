@@ -4,9 +4,8 @@
   "description": "Sets the game engine.",
   "main": "index.js",
   "scripts": {
-    "clean": "if exist dist rmdir /s /q dist && mkdir dist",
-    "build": "npm run clean && tsc -d",
-    "test": "npm run build && mocha dist/test"
+    "pretest": "tsc",
+    "test": "mocha dist/test"
   },
   "author": {
     "name": "Maurice Prosper",
