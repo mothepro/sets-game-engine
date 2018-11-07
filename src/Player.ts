@@ -1,5 +1,6 @@
 import {Set} from './Card'
 import Game from './Game'
+import { Events } from './events'
 
 export default class Player {
     public game!: Game
@@ -43,11 +44,12 @@ export default class Player {
     /** Bans the player from taking any sets. */
     private ban() {
         this.banned = true
-        this.game.emit('playerBanned', [this, this.timeout])
+        this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
+
         setTimeout(() => {
             this.banned = false
             this.timeout += this.timeoutIncrease
-            this.game.emit('playerUnbanned', this)
+            this.game.emit(Events.playerUnbanned, this)
         }, this.timeout)
     }
 }

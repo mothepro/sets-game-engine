@@ -4,17 +4,9 @@ import Card, {Set} from './Card'
 import StrictEventEmitter from 'strict-event-emitter-types'
 import { EventEmitter } from 'events'
 import { shuffle } from './util'
+import { EventMap, Events } from './events'
 
 type Constructor<T> = { new(...args: any[]): T }
-export interface Events {
-    start: void,
-    finish: void,
-    playerBanned: [Player, number],
-    playerUnbanned: Player,
-    playerAdded: Player,
-    marketFilled: void,
-    marketGrab: Set.Cards
-}
 
 export interface State {
     readonly cards: ReadonlyArray<Card>,
@@ -23,7 +15,7 @@ export interface State {
 }
 
 export default class Game
-    extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, Events>>) {
+    extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
     private readonly players_: Set<Player> = new Set
 
     /** Playable cards. */
@@ -100,14 +92,14 @@ export default class Game
         if (!this.inProgress) {
             player.game = this
             this.players_.add(player)
-            this.emit('playerAdded', player)
+            this.emit(Events.playerAdded, player)
         }
         return this
     }
 
     /** Ready up. */
     public start() {
-        this.emit('start')
+        this.emit(Events.start)
         this.fillMarket()
     }
 
@@ -120,7 +112,7 @@ export default class Game
     /** Returns and removes some cards from the market. Updates market. */
     public removeSet(...indexs: Set.Indexs): Set.Cards {
         const ret = this.market.popSet(...indexs)
-        this.emit('marketGrab', ret)
+        this.emit(Events.marketGrab, ret)
         this.fillMarket()
         return ret
     }
@@ -130,6 +122,6 @@ export default class Game
         while (this.cards.length && !this.market.isFull)
             this.market.pushCards(...this.cards.splice(0, 3) as Set.Cards)
         this.inProgress = !this.isDone
-        this.emit(this.inProgress ? 'marketFilled' : 'finish')
+        this.emit(this.inProgress ? Events.marketFilled : Events.finish)
     }
 }

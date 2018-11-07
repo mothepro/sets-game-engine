@@ -1,5 +1,6 @@
-import * as Card from './src/Card'
-import * as Game from './src/Game'
-import * as Player from './src/Player'
+import Card from './src/Card'
+import Game from './src/Game'
+import Player from './src/Player'
+import { Events } from './src/events'
 
-export { Card, Game, Player }
+export { Card, Game, Player, Events }

@@ -3,6 +3,7 @@ import CardsWithoutSet from './helpers/CardsWithoutSet'
 import Card, {Color, Opacity, Quantity, Shape} from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
+import { Events } from '../src/events'
 
 const MARKET_SIZE = 9 // Default number of cards on screen
 const MARKET_INC = 3  // Size of Set
@@ -80,9 +81,9 @@ describe('Players', () => {
         const player = new Player(0)
         game.addPlayer(player)
 
-        game.on('playerBanned', ([player, timeout]) => {
+        game.on(Events.playerBanned, ({player: bannedPlayer, timeout}) => {
             'number'.should.eql(typeof timeout)
-            player.should.eql(player)
+            player.should.eql(bannedPlayer)
             done()
         })
 
@@ -146,21 +147,20 @@ describe('Players', () => {
         ])
         game.addPlayer(player).start()
 
-        // invalid
-        player.takeSet(1, 2, 3)
-
-        // valid, but banned
-        game.on('playerBanned', ([bannedPlayer, timeout]) => {
+        game.on(Events.playerBanned, ({player: bannedPlayer}) => {
             player.should.eql(bannedPlayer)
-            player.takeSet(1, 3, 6).should.eql(false)
+            player.takeSet(1, 3, 6).should.eql(false) // valid, but banned
             player.score.should.eql(0)
         })
 
-        game.on('playerUnbanned', (unbannedPlayer) => {
+        game.on(Events.playerUnbanned, unbannedPlayer => {
             player.should.eql(unbannedPlayer)
             player.takeSet(1, 3, 6).should.eql(true)
             player.score.should.eql(1)
             done()
         })
+
+        // invalid
+        player.takeSet(1, 2, 3)
     })
 })
