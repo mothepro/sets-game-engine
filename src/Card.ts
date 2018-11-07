@@ -1,7 +1,15 @@
-export const enum Color { BLUE, RED, GREEN }
-export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
-export const enum Quantity { ONE, TWO, THREE }
-export const enum Opacity { SOLID, HALF, EMPTY }
+export namespace Details {
+    export const enum Color { BLUE, RED, GREEN }
+    export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
+    export const enum Quantity { ONE, TWO, THREE }
+    export const enum Opacity { SOLID, HALF, EMPTY }
+
+    /** The max number of elements per particular detail. */
+    export const size = 3
+
+    /** The total number of unique details. */
+    export const count = 4
+}
 
 export namespace Set {
     export type Cards = [Card, Card, Card]
@@ -9,23 +17,17 @@ export namespace Set {
 }
 
 export default class Card {
-    /** The max number of elements in a particular detail. */
-    public static readonly DETAILS_SIZE = 3
-
-    /** The total number of details per card. */
-    public static readonly DETAILS_COUNT = 4
-
     /**
      * Number of total different combinations of cards.
      * the max # of options for each detail raised to the # of details.
      */
-    public static readonly COMBINATIONS = Card.DETAILS_SIZE ** Card.DETAILS_COUNT
+    public static readonly COMBINATIONS = Details.size ** Details.count
 
     constructor(
-        public readonly color: Color,
-        public readonly shape: Shape,
-        public readonly quantity: Quantity,
-        public readonly opacity: Opacity,
+        public readonly color: Details.Color,
+        public readonly shape: Details.Shape,
+        public readonly quantity: Details.Quantity,
+        public readonly opacity: Details.Opacity,
     ) {}
 
     /**
@@ -35,18 +37,18 @@ export default class Card {
      * and the others are calculated on the fly.
      */
     get encoding(): number {
-        return this.color   * Card.DETAILS_SIZE ** 0 +
-            this.shape      * Card.DETAILS_SIZE ** 1 +
-            this.quantity   * Card.DETAILS_SIZE ** 2 +
-            this.opacity    * Card.DETAILS_SIZE ** 3
+        return this.color  * Details.size ** 0 +
+            this.shape     * Details.size ** 1 +
+            this.quantity  * Details.size ** 2 +
+            this.opacity   * Details.size ** 3
     }
 
     /** A unique value comparing the difference in the card's details. */
     protected static diff(card1: Card, card2: Card): number {
-        return +(card1.color === card2.color)       << 0 |
-            +(card1.shape === card2.shape)          << 1 |
-            +(card1.quantity === card2.quantity)    << 2 |
-            +(card1.opacity === card2.opacity)      << 3
+        return +(card1.color === card2.color)    << 0 |
+            +(card1.shape === card2.shape)       << 1 |
+            +(card1.quantity === card2.quantity) << 2 |
+            +(card1.opacity === card2.opacity)   << 3
     }
 
     /** Whether 3 cards make a set. */
@@ -76,10 +78,10 @@ export default class Card {
      */
     public static make(encoding: number): Card {
         return new Card(
-            Math.trunc(encoding / Card.DETAILS_SIZE ** 0) % Card.DETAILS_SIZE as Color,
-            Math.trunc(encoding / Card.DETAILS_SIZE ** 1) % Card.DETAILS_SIZE as Shape,
-            Math.trunc(encoding / Card.DETAILS_SIZE ** 2) % Card.DETAILS_SIZE as Quantity,
-            Math.trunc(encoding / Card.DETAILS_SIZE ** 3) % Card.DETAILS_SIZE as Opacity,
+            Math.trunc(encoding / Details.size ** 0) % Details.size as Details.Color,
+            Math.trunc(encoding / Details.size ** 1) % Details.size as Details.Shape,
+            Math.trunc(encoding / Details.size ** 2) % Details.size as Details.Quantity,
+            Math.trunc(encoding / Details.size ** 3) % Details.size as Details.Opacity,
         )
     }
 }

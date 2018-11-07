@@ -1,6 +1,6 @@
 import 'should'
 import CardsWithoutSet from './helpers/CardsWithoutSet'
-import Card, {Color, Opacity, Quantity, Shape} from '../src/Card'
+import Card, { Details } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
 import { Events } from '../src/events'
@@ -100,16 +100,16 @@ describe('Players', () => {
 
         game.setCards([
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
             Card.make(5),
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
         ])
         game.addPlayer(player1).addPlayer(player2).start()
 
@@ -137,12 +137,12 @@ describe('Players', () => {
 
         game.setCards([
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
             Card.make(5),
             Card.make(5),
-            new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
             Card.make(5),
         ])
         game.addPlayer(player).start()

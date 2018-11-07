@@ -1,18 +1,18 @@
-import Card, {Color, Opacity, Quantity, Shape} from '../../src/Card'
+import Card, { Details } from '../../src/Card'
 
 const CardsWithoutSet: Card[] = [
-    new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
-    new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
-    new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
-    new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
-    new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
-    new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
-    new Card(Color.RED, Shape.SQUARE, Quantity.TWO, Opacity.HALF),
-    new Card(Color.RED, Shape.SQUARE, Quantity.TWO, Opacity.HALF),
-    new Card(Color.RED, Shape.SQUARE, Quantity.ONE, Opacity.SOLID),
-    new Card(Color.RED, Shape.SQUARE, Quantity.ONE, Opacity.SOLID),
-    new Card(Color.GREEN, Shape.SQUARE, Quantity.ONE, Opacity.SOLID),
-    new Card(Color.GREEN, Shape.SQUARE, Quantity.ONE, Opacity.SOLID),
+    new Card(Details.Color.BLUE, Details.Shape.CIRCLE,  Details.Quantity.ONE,   Details.Opacity.EMPTY),
+    new Card(Details.Color.BLUE, Details.Shape.CIRCLE,  Details.Quantity.ONE,   Details.Opacity.EMPTY),
+    new Card(Details.Color.BLUE, Details.Shape.CIRCLE,  Details.Quantity.ONE,   Details.Opacity.SOLID),
+    new Card(Details.Color.BLUE, Details.Shape.CIRCLE,  Details.Quantity.ONE,   Details.Opacity.SOLID),
+    new Card(Details.Color.RED,  Details.Shape.SQUARE,  Details.Quantity.THREE, Details.Opacity.SOLID),
+    new Card(Details.Color.RED,  Details.Shape.SQUARE,  Details.Quantity.THREE, Details.Opacity.SOLID),
+    new Card(Details.Color.RED,  Details.Shape.SQUARE,  Details.Quantity.TWO,   Details.Opacity.HALF),
+    new Card(Details.Color.RED,  Details.Shape.SQUARE,  Details.Quantity.TWO,   Details.Opacity.HALF),
+    new Card(Details.Color.RED,  Details.Shape.SQUARE,  Details.Quantity.ONE,   Details.Opacity.SOLID),
+    new Card(Details.Color.RED,  Details.Shape.SQUARE,  Details.Quantity.ONE,   Details.Opacity.SOLID),
+    new Card(Details.Color.GREEN, Details.Shape.SQUARE, Details.Quantity.ONE,   Details.Opacity.SOLID),
+    new Card(Details.Color.GREEN, Details.Shape.SQUARE, Details.Quantity.ONE,   Details.Opacity.SOLID),
 ]
 
 export default CardsWithoutSet
