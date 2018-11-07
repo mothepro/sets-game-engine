@@ -80,7 +80,8 @@ describe('Players', () => {
         const player = new Player(0)
         game.addPlayer(player)
 
-        game.on('playerBanned', (player, timeout) => {
+        game.on('playerBanned', ([player, timeout]) => {
+            'number'.should.eql(typeof timeout)
             player.should.eql(player)
             done()
         })
@@ -149,7 +150,7 @@ describe('Players', () => {
         player.takeSet(1, 2, 3)
 
         // valid, but banned
-        game.on('playerBanned', (bannedPlayer, timeout) => {
+        game.on('playerBanned', ([bannedPlayer, timeout]) => {
             player.should.eql(bannedPlayer)
             player.takeSet(1, 3, 6).should.eql(false)
             player.score.should.eql(0)

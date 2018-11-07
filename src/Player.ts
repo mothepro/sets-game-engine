@@ -43,7 +43,7 @@ export default class Player {
     /** Bans the player from taking any sets. */
     private ban() {
         this.banned = true
-        this.game.emit('playerBanned', this, this.timeout)
+        this.game.emit('playerBanned', [this, this.timeout])
         setTimeout(() => {
             this.banned = false
             this.timeout += this.timeoutIncrease

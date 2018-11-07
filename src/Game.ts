@@ -5,10 +5,11 @@ import StrictEventEmitter from 'strict-event-emitter-types'
 import { EventEmitter } from 'events'
 import { shuffle } from './util'
 
+type Constructor<T> = { new(...args: any[]): T }
 export interface Events {
     start: void,
     finish: void,
-    playerBanned: (p: Player, time: number) => void,
+    playerBanned: [Player, number],
     playerUnbanned: Player,
     playerAdded: Player,
     marketFilled: void,
@@ -22,7 +23,7 @@ export interface State {
 }
 
 export default class Game
-    extends (EventEmitter as { new(): StrictEventEmitter<EventEmitter, Events>}) {
+    extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, Events>>) {
     private readonly players_: Set<Player> = new Set
 
     /** Playable cards. */
@@ -36,8 +37,11 @@ export default class Game
 
     constructor({
       shoe = 1,
-      rng = (max: number) => (Math.random() * max) >>> 0
-    } = {}) {
+      rng,
+    }: Partial<{
+        shoe: number,
+        rng: (max: number) => number,
+    }> = {}) {
         super()
         for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
             this.cards.push(Card.make(i))
