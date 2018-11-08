@@ -74,7 +74,7 @@ export default class Card {
     /**
      * Build a Card using a single number as an encoding for Color, Shape, Quantity and Opacity.
      *
-     * @param {number} encoding Number between 0 and total combinations
+     * @param encoding Number between 0 and total combinations
      */
     public static make(encoding: number): Card {
         return new Card(

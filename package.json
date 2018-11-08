@@ -1,10 +1,13 @@
 {
   "name": "sets-game-engine",
+  "private": true,
   "version": "0.0.1",
   "description": "Sets the game engine.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "pretest": "tsc",
+    "postinstall": "tsc",
     "test": "mocha dist/test"
   },
   "author": {

@@ -14,6 +14,28 @@ export interface State {
     readonly players: ReadonlyArray<Player>,
 }
 
+interface Timeout {
+    /** The inital timeout for all players. */
+    readonly initial: number
+
+    /** After a player is banned, their timeout will increase by this amount. */
+    increase: number
+
+    /** After a player is banned everyone's next timeout will increase by this amount. */
+    readonly increaseIncreaser: number
+}
+
+interface GameOptions {
+    /** Size of the deck. */
+    shoe: number
+
+    /** A random number generator for generating the cards. */
+    rng: (max: number) => number
+
+    /** Banning players after taking an invalid set. */
+    timeout: Partial<Timeout>
+}
+
 export default class Game
     extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
     private readonly players_: Set<Player> = new Set
@@ -24,20 +46,30 @@ export default class Game
     /** The cards shown the players. */
     protected readonly market = new Market
 
-    /** Whether the game is started and currently being played.*/
+    /** Whether the game is started and currently being played. */
     protected inProgress = false
+
+    /** Numbers pertaining to blocking a player after taking an invalid set. */
+    public readonly timeout: Timeout
 
     constructor({
       shoe = 1,
       rng,
-    }: Partial<{
-        shoe: number,
-        rng: (max: number) => number,
-    }> = {}) {
+      timeout: {
+          initial           = 1000,
+          increase          = 1000,
+          increaseIncreaser = 0,
+      } = {},
+    }: Partial<GameOptions> = {}) {
         super()
+
+        this.timeout = {initial, increase, increaseIncreaser}
         for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards, rng)
+
+        if (this.timeout.increaseIncreaser)
+            this.on(Events.playerBanned, () => this.timeout.increase += this.timeout.increaseIncreaser)
     }
 
     get isDeckEmpty(): boolean {
@@ -49,7 +81,7 @@ export default class Game
         return this.isDeckEmpty && !this.market.isPlayable
     }
 
-    get unplayableCards(): number {
+    get unplayedCards(): number {
         return this.cards.length
     }
 
@@ -89,8 +121,9 @@ export default class Game
 
     /** Adds a new player to the game before starting. */
     public addPlayer(player: Player): this {
-        if (!this.inProgress) {
+        if (!this.inProgress && !this.players_.has(player)) {
             player.game = this
+            player.timeout = this.timeout.initial
             this.players_.add(player)
             this.emit(Events.playerAdded, player)
         }

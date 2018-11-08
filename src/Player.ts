@@ -1,6 +1,6 @@
-import {Set} from './Card'
-import Game from './Game'
+import { Set } from './Card'
 import { Events } from './events'
+import Game from './Game'
 
 export default class Player {
     public game!: Game
@@ -11,10 +11,8 @@ export default class Player {
     /** Whether not timed out from taking sets. */
     private banned = false
 
-    constructor(
-        public timeout: number = 1000,
-        public timeoutIncrease: number = 0,
-    ) {}
+    /** How long the user will be blocked for after a wrong attempt */
+    public timeout!: number
 
     /** Number of collected Sets. */
     public get score(): number {
@@ -48,7 +46,7 @@ export default class Player {
 
         setTimeout(() => {
             this.banned = false
-            this.timeout += this.timeoutIncrease
+            this.timeout += this.game.timeout.increase
             this.game.emit(Events.playerUnbanned, this)
         }, this.timeout)
     }
