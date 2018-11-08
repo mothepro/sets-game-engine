@@ -34,10 +34,14 @@ interface GameOptions {
 
     /** Banning players after taking an invalid set. */
     timeout: Partial<Timeout>
+
+    /** Shortcut for adding players early. */
+    players: Player[]
 }
 
 export default class Game
     extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
+
     private readonly players_: Set<Player> = new Set
 
     /** Playable cards. */
@@ -60,6 +64,7 @@ export default class Game
           increase          = 1000,
           increaseIncreaser = 0,
       } = {},
+      players = [],
     }: Partial<GameOptions> = {}) {
         super()
 
@@ -70,6 +75,9 @@ export default class Game
 
         if (this.timeout.increaseIncreaser)
             this.on(Events.playerBanned, () => this.timeout.increase += this.timeout.increaseIncreaser)
+
+        for(const player of players)
+            this.addPlayer(player)
     }
 
     get isDeckEmpty(): boolean {
