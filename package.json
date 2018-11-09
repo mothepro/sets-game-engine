@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "pretest": "tsc",
+    "postinstall": "tsc",
     "test": "mocha dist/test"
   },
   "author": {
