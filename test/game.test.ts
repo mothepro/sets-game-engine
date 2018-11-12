@@ -96,10 +96,7 @@ describe('Players', () => {
     it('should get the winners', () => {
         const player1 = new Player
         const player2 = new Player
-        const game = new MutableGame({
-            timeout: {initial: 0},
-            players: [player1, player2],
-        })
+        const game = new MutableGame({timeout: {initial: 0}})
 
         game.setCards([
             Card.make(5),
@@ -114,7 +111,7 @@ describe('Players', () => {
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
         ])
-        game.start()
+        game.addPlayer(player1).addPlayer(player2).start()
 
         game.maxScore.should.eql(0)
         game.winners.should.containEql(player1)
