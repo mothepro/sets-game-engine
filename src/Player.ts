@@ -1,6 +1,8 @@
 import { Set } from './Card'
 import { Events } from './events'
 import Game from './Game'
+import { close } from 'inspector';
+import { SSL_OP_LEGACY_SERVER_CONNECT } from 'constants';
 
 export default class Player {
     public game!: Game
@@ -25,29 +27,24 @@ export default class Player {
 
     /** If possible, move a set from the market to a player. */
     public takeSet(...indexs: Set.Indexs): boolean {
-        let ret = false
+        if (!this.banned && this.game.checkSet(...indexs))
+            return !!this.sets.push(this.game.removeSet(...indexs))
 
-        if(!this.banned) {
-            ret = this.game.checkSet(...indexs)
-
-            if (ret)
-                this.sets.push(this.game.removeSet(...indexs))
-            else
-                this.ban()
-        }
-
-        return ret
+        this.ban()
+        return false
     }
 
     /** Bans the player from taking any sets. */
     private ban() {
-        this.banned = true
-        this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
+        if (this.banned || !this.timeout) // no need to ban
+            return
 
         setTimeout(() => {
             this.banned = false
-            this.timeout += this.game.timeout.increase
             this.game.emit(Events.playerUnbanned, this)
         }, this.timeout)
+
+        this.banned = true
+        this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
     }
 }

@@ -1,6 +1,6 @@
 import Market from './Market'
 import Player from './Player'
-import Card, {Set} from './Card'
+import Card, { Set } from './Card'
 import StrictEventEmitter from 'strict-event-emitter-types'
 import { EventEmitter } from 'events'
 import { shuffle } from './util'
@@ -14,17 +14,6 @@ export interface State {
     readonly players: ReadonlyArray<Player>,
 }
 
-interface Timeout {
-    /** The inital timeout for all players. */
-    readonly initial: number
-
-    /** After a player is banned, their timeout will increase by this amount. */
-    increase: number
-
-    /** After a player is banned everyone's next timeout will increase by this amount. */
-    readonly increaseIncreaser: number
-}
-
 interface GameOptions {
     /** Size of the deck. */
     shoe: number
@@ -32,14 +21,18 @@ interface GameOptions {
     /** A random number generator for generating the cards. */
     rng: (max: number) => number
 
-    /** Banning players after taking an invalid set. */
-    timeout: Partial<Timeout>
+    /** The inital timeout for all players. */
+    timeout: number
+
+    /** Calculate the next time out for a player. */
+    nextTimeout: (oldTimeout: number, player: Player) => number
 }
 
 export default class Game
     extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
 
     private readonly players_: Set<Player> = new Set
+    private readonly initialTimeout: number
 
     /** Playable cards. */
     protected readonly cards: Card[] = []
@@ -50,27 +43,21 @@ export default class Game
     /** Whether the game is started and currently being played. */
     protected inProgress = false
 
-    /** Numbers pertaining to blocking a player after taking an invalid set. */
-    public readonly timeout: Timeout
-
     constructor({
       shoe = 1,
+      timeout = 0,
       rng,
-      timeout: {
-          initial           = 1000,
-          increase          = 1000,
-          increaseIncreaser = 0,
-      } = {},
+      nextTimeout,
     }: Partial<GameOptions> = {}) {
         super()
 
-        this.timeout = {initial, increase, increaseIncreaser}
         for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards, rng)
 
-        if (this.timeout.increaseIncreaser)
-            this.on(Events.playerBanned, () => this.timeout.increase += this.timeout.increaseIncreaser)
+        if (nextTimeout && timeout)
+            this.on(Events.playerBanned, ({player}) => player.timeout = nextTimeout(player.timeout, player))
+        this.initialTimeout = timeout
     }
 
     get isDeckEmpty(): boolean {
@@ -124,7 +111,7 @@ export default class Game
     public addPlayer(player: Player): this {
         if (!this.inProgress && !this.players_.has(player)) {
             player.game = this
-            player.timeout = this.timeout.initial
+            player.timeout = this.initialTimeout
             this.players_.add(player)
             this.emit(Events.playerAdded, player)
         }

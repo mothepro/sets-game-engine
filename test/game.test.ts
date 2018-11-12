@@ -77,7 +77,7 @@ describe('Game\'s Deck', () => {
 
 describe('Players', () => {
     it('should ban', done => {
-        const game = new MutableGame({timeout: {initial: 0}})
+        const game = new MutableGame({timeout: 1})
         const player = new Player
         game.addPlayer(player)
 
@@ -90,13 +90,37 @@ describe('Players', () => {
         game.start()
 
         // keep taking this set, player should be banned eventually.
-        while(player.takeSet(1, 2, 3));
+        setInterval(() => player.takeSet(1, 2, 3), 10)
+    })
+
+    it.only('should ban and increase', done => {
+        const expectedTimeouts = [1, 2, 4]
+
+        const game = new MutableGame({
+            timeout: 1,
+            nextTimeout: (old) => old * 2
+        })
+        const player = new Player
+        game.addPlayer(player)
+
+        game.on(Events.playerBanned, ({player: bannedPlayer, timeout}) => {
+            timeout.should.eql(expectedTimeouts.shift())
+            player.should.eql(bannedPlayer)
+
+            if(!expectedTimeouts.length)
+                done()
+        })
+
+        game.start()
+
+        // keep taking this sets
+        setInterval(() => player.takeSet(1, 2, 3), 10)
     })
 
     it('should get the winners', () => {
         const player1 = new Player
         const player2 = new Player
-        const game = new MutableGame({timeout: {initial: 0}})
+        const game = new MutableGame
 
         game.setCards([
             Card.make(5),
@@ -132,7 +156,7 @@ describe('Players', () => {
     })
 
     it('should not be able to play during ban', done => {
-        const game = new MutableGame({timeout: {initial: 0}})
+        const game = new MutableGame({timeout: 1})
         const player = new Player
 
         game.setCards([
