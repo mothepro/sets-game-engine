@@ -8,12 +8,6 @@ import { EventMap, Events } from './events'
 
 type Constructor<T> = { new(...args: any[]): T }
 
-export interface State {
-    readonly cards: ReadonlyArray<Card>,
-    readonly market: Market,
-    readonly players: ReadonlyArray<Player>,
-}
-
 interface GameOptions {
     /** Size of the deck. */
     shoe: number
@@ -32,7 +26,7 @@ export default class Game
     extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
 
     private readonly players_: Set<Player> = new Set
-    private readonly initialTimeout: number
+    private initialTimeout: number
 
     /** Playable cards. */
     protected readonly cards: Card[] = []
@@ -90,14 +84,6 @@ export default class Game
         return this.players.filter(player => player.score == this.maxScore)
     }
 
-    get state(): State {
-        return {
-            cards: this.cards,
-            market: this.market,
-            players: this.players as Player[],
-        }
-    }
-
     public setCards(cards: Card[] | number[]) {
         if (this.inProgress)
             throw Error('Can not load cards into a game in progress')
@@ -122,6 +108,7 @@ export default class Game
     public start() {
         this.emit(Events.start)
         this.fillMarket()
+        delete this.initialTimeout
     }
 
     /** Whether a set of cards in the market is valid to take. */
