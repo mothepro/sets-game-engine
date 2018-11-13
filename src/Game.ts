@@ -133,7 +133,6 @@ export default class Game
     /** Returns and removes some cards from the market. Updates market. */
     public removeSet(...indexs: Set.Indexs): Set.Cards {
         const ret = this.market.popSet(...indexs)
-        this.emit(Events.marketGrab, ret)
         this.fillMarket()
         return ret
     }

@@ -27,8 +27,12 @@ export default class Player {
 
     /** If possible, move a set from the market to a player. */
     public takeSet(...indexs: Set.Indexs): boolean {
-        if (!this.banned && this.game.checkSet(...indexs))
-            return !!this.sets.push(this.game.removeSet(...indexs))
+        if (!this.banned && this.game.checkSet(...indexs)) {
+            const set = this.game.removeSet(...indexs)
+            this.sets.push(set)
+            this.game.emit(Events.marketGrab, set)
+            return true
+        }
 
         this.ban()
         return false
