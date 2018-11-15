@@ -1,8 +1,6 @@
 import { Set } from './Card'
 import { Events } from './events'
 import Game from './Game'
-import { close } from 'inspector';
-import { SSL_OP_LEGACY_SERVER_CONNECT } from 'constants';
 
 export default class Player {
     public game!: Game
@@ -25,30 +23,28 @@ export default class Player {
         return this.banned
     }
 
-    /** If possible, move a set from the market to a player. */
+    /**
+     * If possible, move a set from the market to a player.
+     * If not, ban the player from taking any sets for `this.timeout`
+     * @returns true iff a set was taken.
+     */
     public takeSet(...indexs: Set.Indexs): boolean {
-        if (!this.banned && this.game.checkSet(...indexs)) {
-            const set = this.game.removeSet(...indexs)
-            this.sets.push(set)
-            this.game.emit(Events.marketGrab, set)
-            return true
+        if (!this.banned) {
+            if (this.game.checkSet(...indexs)) {
+                const set = this.game.removeSet(...indexs)
+                this.sets.push(set)
+                this.game.emit(Events.marketGrab, set)
+                return true
+            } else if (this.timeout) {
+                setTimeout(() => {
+                    this.banned = false
+                    this.game.emit(Events.playerUnbanned, this)
+                }, this.timeout)
+
+                this.banned = true
+                this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
+            }
         }
-
-        this.ban()
         return false
-    }
-
-    /** Bans the player from taking any sets. */
-    private ban() {
-        if (this.banned || !this.timeout) // no need to ban
-            return
-
-        setTimeout(() => {
-            this.banned = false
-            this.game.emit(Events.playerUnbanned, this)
-        }, this.timeout)
-
-        this.banned = true
-        this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
     }
 }
