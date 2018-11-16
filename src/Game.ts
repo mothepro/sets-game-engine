@@ -18,7 +18,11 @@ interface GameOptions {
     /** The inital timeout for all players. */
     timeout: number
 
-    /** Calculate the next time out for a player. */
+    /**
+     * Calculate the next time out for a player.
+     * When the game starts this function is used to set the timeout for each player.
+     * The `oldTimeout` parameter is set to 0 for this case.
+     */
     nextTimeout: (oldTimeout: number, player: Player) => number
 }
 
@@ -26,7 +30,6 @@ export default class Game
     extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
 
     private readonly players_: Set<Player> = new Set
-    private initialTimeout: number
 
     /** Playable cards. */
     protected readonly cards: Card[] = []
@@ -37,21 +40,21 @@ export default class Game
     /** Whether the game is started and currently being played. */
     protected inProgress = false
 
-    constructor({
-      shoe = 1,
-      timeout = 0,
-      rng,
-      nextTimeout,
-    }: Partial<GameOptions> = {}) {
+    constructor({shoe = 1, rng, nextTimeout}: Partial<GameOptions> = {}) {
         super()
 
         for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards, rng)
 
-        if (nextTimeout && timeout)
+        if (nextTimeout) {
+            // reset timeouts
+            this.on(Events.start, () => {
+                for(const player of this.players_)
+                    player.timeout = nextTimeout(0, player)
+            })
             this.on(Events.playerBanned, ({player}) => player.timeout = nextTimeout(player.timeout, player))
-        this.initialTimeout = timeout
+        }
     }
 
     get isDeckEmpty(): boolean {
@@ -97,7 +100,6 @@ export default class Game
     public addPlayer(player: Player): this {
         if (!this.inProgress && !this.players_.has(player)) {
             player.game = this
-            player.timeout = this.initialTimeout
             this.players_.add(player)
             this.emit(Events.playerAdded, player)
         }
@@ -108,7 +110,6 @@ export default class Game
     public start() {
         this.emit(Events.start)
         this.fillMarket()
-        delete this.initialTimeout
     }
 
     /** Whether a set of cards in the market is valid to take. */
