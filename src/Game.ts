@@ -15,9 +15,6 @@ interface GameOptions {
     /** A random number generator for generating the cards. */
     rng: (max: number) => number
 
-    /** The inital timeout for all players. */
-    timeout: number
-
     /**
      * Calculate the next time out for a player.
      * When the game starts this function is used to set the timeout for each player.
@@ -110,6 +107,7 @@ export default class Game
     public start() {
         this.emit(Events.start)
         this.fillMarket()
+        return this
     }
 
     /** Whether a set of cards in the market is valid to take. */
@@ -123,6 +121,13 @@ export default class Game
         const ret = this.market.popSet(...indexs)
         this.fillMarket()
         return ret
+    }
+
+    public hint(): Set.Indexs {
+        const indexes = Card.getSet([...this.playableCards])
+        if (indexes)
+            return indexes
+        throw Error('No hint can be given since a set can not be made.')
     }
 
     /** Fill the market with cards. */

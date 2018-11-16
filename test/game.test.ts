@@ -4,18 +4,14 @@ import Card, { Details } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
 import { Events } from '../src/events'
+import Market from '../src/Market'
 
 const MARKET_SIZE = 9 // Default number of cards on screen
 const MARKET_INC = 3  // Size of Set
-class MutableGame extends Game {
-    public get theMarket() {
-        return this.market
-    }
-}
 
 describe('Game\'s Deck', () => {
     it('Market should fill up normally', () => {
-        const game = new MutableGame
+        const game = new Game
 
         game.playableCards.length.should.equal(0)
         game.start()
@@ -29,7 +25,7 @@ describe('Game\'s Deck', () => {
     })
 
     it('Market should fill up all the way because a set can\'t be made', () => {
-        const game = new MutableGame
+        const game = new Game
         game.setCards(CardsWithoutSet)
         game.playableCards.should.be.empty()
         game.start()
@@ -38,14 +34,14 @@ describe('Game\'s Deck', () => {
     })
 
     it('Deck should be complete', () => {
-        const game = new MutableGame
+        const game = new Game
         game.isDone.should.be.false()
         game.setCards([])
         game.isDone.should.be.true()
     })
 
     it('Should remove cards and keep order', () => {
-        const game = new MutableGame
+        const game = new Game
         const card1 = Card.make(1)
         const card2 = Card.make(2)
         const card3 = Card.make(3)
@@ -63,7 +59,8 @@ describe('Game\'s Deck', () => {
 
         game.playableCards.length.should.eql(8)
 
-        const removedCards = game.theMarket.popSet(1, 3, 6)
+        const market = game['market'] // Private member
+        const removedCards = market.popSet(1, 3, 6)
 
         removedCards.length.should.eql(3)
         removedCards.should.containEql(card1)
@@ -73,32 +70,61 @@ describe('Game\'s Deck', () => {
         for(const card of game.playableCards)
             card.encoding.should.eql(5)
     })
+
+    it('Give me a hint', () => {
+        const game = new Game
+
+        game.setCards([
+            Card.make(5),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
+            Card.make(5),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
+            Card.make(12),
+            Card.make(12),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
+            Card.make(13),
+        ])
+        game.start()
+
+        const hint = game.hint()
+        hint.should.containEql(1)
+        hint.should.containEql(3)
+        hint.should.containEql(6)
+    })
+
+    it('Don\'t give me a hint', () => {
+        const game = new Game
+        game.setCards(CardsWithoutSet)
+        game.start()
+
+        ;(() => game.hint()).should.throw()
+    })
 })
 
 describe('Players', () => {
     it('should ban', done => {
-        const game = new MutableGame({timeout: 1})
+        const game = new Game({nextTimeout: () => 1})
         const player = new Player
-        game.addPlayer(player)
 
         game.on(Events.playerBanned, ({player: bannedPlayer, timeout}) => {
             'number'.should.eql(typeof timeout)
             player.should.eql(bannedPlayer)
+
+            clearInterval(interval)
             done()
         })
 
-        game.start()
+        game.addPlayer(player).start()
 
         // keep taking this set, player should be banned eventually.
-        setInterval(() => player.takeSet(1, 2, 3), 10)
+        const interval = setInterval(() => player.takeSet(1, 2, 3), 10)
     })
 
-    it.only('should ban and increase', done => {
+    it('should ban and increase', done => {
         const expectedTimeouts = [1, 2, 4]
 
-        const game = new MutableGame({
-            timeout: 1,
-            nextTimeout: (old) => old * 2
+        const game = new Game({
+            nextTimeout: (old) => old == 0 ? 1 : old * 2
         })
         const player = new Player
         game.addPlayer(player)
@@ -107,20 +133,22 @@ describe('Players', () => {
             timeout.should.eql(expectedTimeouts.shift())
             player.should.eql(bannedPlayer)
 
-            if(!expectedTimeouts.length)
+            if(!expectedTimeouts.length) {
+                clearInterval(interval)
                 done()
+            }
         })
 
         game.start()
 
         // keep taking this sets
-        setInterval(() => player.takeSet(1, 2, 3), 10)
+        const interval = setInterval(() => player.takeSet(1, 2, 3), 10)
     })
 
     it('should get the winners', () => {
         const player1 = new Player
         const player2 = new Player
-        const game = new MutableGame
+        const game = new Game
 
         game.setCards([
             Card.make(5),
@@ -156,7 +184,7 @@ describe('Players', () => {
     })
 
     it('should not be able to play during ban', done => {
-        const game = new MutableGame({timeout: 1})
+        const game = new Game({nextTimeout: () => 1})
         const player = new Player
 
         game.setCards([

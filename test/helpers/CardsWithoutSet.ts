@@ -19,7 +19,7 @@ export default CardsWithoutSet
 
 describe('Test Helpers', () => {
     it('Should not make a set', done => {
-        Card.hasSet(CardsWithoutSet).should.be.false()
+        Card.getSet(CardsWithoutSet).should.be.false()
         done()
     })
 })

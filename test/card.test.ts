@@ -71,39 +71,39 @@ describe('Card', () => {
 
     describe('Having a set', () => {
         it('all same', done => {
-            Card.hasSet([
+            Card.getSet([
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-            ]).should.be.true()
+            ]).should.not.be.false()
             done()
         })
 
         it('all different', done => {
-            Card.hasSet([
+            Card.getSet([
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.GREEN, Details.Shape.SQUARE, Details.Quantity.TWO, Details.Opacity.HALF),
                 new Card(Details.Color.RED, Details.Shape.TRIANGLE, Details.Quantity.THREE, Details.Opacity.SOLID),
-            ]).should.be.true()
+            ]).should.not.be.false()
             done()
         })
 
         it('some same, some different', done => {
-            Card.hasSet([
+            Card.getSet([
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.GREEN, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.EMPTY),
                 new Card(Details.Color.RED, Details.Shape.CIRCLE, Details.Quantity.THREE, Details.Opacity.EMPTY),
-            ]).should.be.true()
+            ]).should.not.be.false()
             done()
         })
     })
 
     describe('Doesn\'t have a set', () => {
         it('two pairs', done => {
-            Card.hasSet([
+            Card.getSet([
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
@@ -113,7 +113,7 @@ describe('Card', () => {
         })
 
         it('one pair', done => {
-            Card.hasSet([
+            Card.getSet([
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
             ]).should.be.false()

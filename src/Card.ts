@@ -12,8 +12,9 @@ export namespace Details {
 }
 
 export namespace Set {
+    type index = number
     export type Cards = [Card, Card, Card]
-    export type Indexs = [number, number, number] // Accessing a Set through its indices.
+    export type Indexs = [index, index, index] // Accessing a Set through its indices.
 }
 
 export default class Card {
@@ -60,14 +61,18 @@ export default class Card {
         ].every(diff => diff === first)
     }
 
-    /** Whether a group of cards can make a set. ~~ O(n**3) ~~ */
-    public static hasSet(cards: Card[]): boolean {
+    /**
+     * The indexes of the cards given which make a valid set.
+     * Returns false if a valid set can not be made.
+     * O(n**3) >:(
+     */
+    public static getSet(cards: Card[]): Set.Indexs | false {
         if(cards.length >= 3)
             for(let i = 0; i < cards.length; i++)
                 for(let j = i + 1; j < cards.length; j++)
                     for(let k = j + 1; k < cards.length; k++)
                         if(Card.isSet(cards[i], cards[j], cards[k]))
-                            return true
+                            return [i, j, k]
         return false
     }
 

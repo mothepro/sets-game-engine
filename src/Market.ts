@@ -11,7 +11,7 @@ export default class Market {
     }
 
     get isPlayable(): boolean {
-        return Card.hasSet(this.cards_)
+        return !!Card.getSet(this.cards_)
     }
 
     get isFull(): boolean {
