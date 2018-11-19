@@ -63,10 +63,6 @@ export default class Game
         return this.isDeckEmpty && !this.market.isPlayable
     }
 
-    get unplayedCards(): number {
-        return this.cards.length
-    }
-
     get playableCards(): ReadonlyArray<Card> {
         return this.market.cards
     }
@@ -133,7 +129,8 @@ export default class Game
     /** Fill the market with cards. */
     private fillMarket(): void {
         while (this.cards.length && !this.market.isFull)
-            this.market.pushCards(...this.cards.splice(0, 3) as Set.Cards)
+            this.market.pushCards(this.cards.splice(0, 3) as Set.Cards)
+        this.market.cleanUp()
         this.inProgress = !this.isDone
         this.emit(this.inProgress ? Events.marketFilled : Events.finish)
     }

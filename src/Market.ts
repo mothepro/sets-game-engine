@@ -11,27 +11,36 @@ export default class Market {
     }
 
     get isPlayable(): boolean {
-        return !!Card.getSet(this.cards_)
+        return !!Card.getSet(this.cards_.filter(card => !!card))
     }
 
     get isFull(): boolean {
-        return this.isPlayable && this.cards_.length >= Market.SIZE
+        return this.isPlayable
+            && this.cards_.filter(card => !!card).length >= Market.SIZE
     }
 
-    public pushCards(...cards: Set.Cards) {
-        this.cards_.push(...cards)
+    /** Adds cards to market, also filling up any empty spots */
+    pushCards(cards: Set.Cards) {
+        for (let i = 0; cards.length && i < this.cards_.length; i++)
+            if (this.cards_[i] == undefined)
+                this.cards_[i] = cards.shift()!
+        if (cards.length)
+            this.cards_.push(...cards)
     }
 
-    public popSet(...indexs: Set.Indexs): Set.Cards {
+    /** Removes a set from the deck, leaving empty spots */
+    popSet(...indexs: Set.Indexs): Set.Cards {
         const ret = []
         for(const index of indexs) {
             ret.push(this.cards_[index])
             delete this.cards_[index]
         }
 
-        // remove non cards_
-        this.cards_ = this.cards_.filter(card => card instanceof Card)
-
         return ret as Set.Cards
+    }
+
+    /** Removes empty spots in deck */
+    cleanUp() {
+        this.cards_ = this.cards_.filter(card => card instanceof Card)
     }
 }

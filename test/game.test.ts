@@ -4,7 +4,6 @@ import Card, { Details } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
 import { Events } from '../src/events'
-import Market from '../src/Market'
 
 const MARKET_SIZE = 9 // Default number of cards on screen
 const MARKET_INC = 3  // Size of Set
@@ -61,6 +60,7 @@ describe('Game\'s Deck', () => {
 
         const market = game['market'] // Private member
         const removedCards = market.popSet(1, 3, 6)
+        market.cleanUp()
 
         removedCards.length.should.eql(3)
         removedCards.should.containEql(card1)
@@ -152,12 +152,13 @@ describe('Players', () => {
 
         game.setCards([
             Card.make(5),
+            Card.make(5),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
             Card.make(5),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
             Card.make(5),
-            Card.make(5),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
+            Card.make(5),
             Card.make(5),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
@@ -169,13 +170,13 @@ describe('Players', () => {
         game.winners.should.containEql(player1)
         game.winners.should.containEql(player2)
 
-        player2.takeSet(1, 3, 6)
+        player2.takeSet(2, 4, 6)
 
         game.maxScore.should.eql(1)
         game.winners.length.should.eql(1)
         game.winners.should.containEql(player2)
 
-        player1.takeSet(5, 6, 7)
+        player1.takeSet(2, 4, 6)
 
         game.maxScore.should.eql(1)
         game.winners.length.should.eql(2)
