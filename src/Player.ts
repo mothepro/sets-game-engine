@@ -1,4 +1,4 @@
-import { Set } from './Card'
+import { CardSet } from './Card'
 import { Events } from './events'
 import Game from './Game'
 
@@ -6,12 +6,12 @@ export default class Player {
     public game!: Game
 
     /** Sets taken from the Game. */
-    public readonly sets: Set.Cards[] = []
+    public readonly sets: CardSet[] = []
 
     /** Whether not timed out from taking sets. */
     private banned = false
 
-    /** How long the user will be blocked for after a wrong attempt */
+    /** If positive, number of ms the user will be blocked for after a wrong attempt. */
     public timeout!: number
 
     /** Number of collected Sets. */
@@ -28,10 +28,10 @@ export default class Player {
      * If not, ban the player from taking any sets for `this.timeout`
      * @returns true iff a set was taken.
      */
-    public takeSet(...indexs: Set.Indexs): boolean {
+    public takeSet(...cards: CardSet): boolean {
         if (!this.banned) {
-            if (this.game.checkSet(...indexs)) {
-                const set = this.game.removeSet(...indexs)
+            if (this.game.check(...cards)) {
+                const set = this.game.take(...cards)
                 this.sets.push(set)
                 this.game.emit(Events.marketGrab, set)
                 return true

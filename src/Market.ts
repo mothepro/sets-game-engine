@@ -1,8 +1,6 @@
-import Card, {Set} from './Card'
+import Card, {CardSet} from './Card'
 
 export default class Market {
-    /** The number of cards that are shown in the market. */
-    protected static readonly SIZE = 9
 
     protected cards_: Card[] = []
 
@@ -15,23 +13,33 @@ export default class Market {
     }
 
     get isFull(): boolean {
-        return this.isPlayable && this.cards_.length >= Market.SIZE
+        return this.isPlayable &&
+            this.cards_.length >= 9 // Minimum number of cards that should be in the market
     }
 
-    public pushCards(...cards: Set.Cards) {
+    public pushCards(...cards: CardSet) {
         this.cards_.push(...cards)
     }
 
-    public popSet(...indexs: Set.Indexs): Set.Cards {
+    public popSet(...cards: CardSet): CardSet {
+        this.assert(cards)
+
         const ret = []
-        for(const index of indexs) {
-            ret.push(this.cards_[index])
-            delete this.cards_[index]
+        for(const card of cards) {
+            ret.push(card)
+            delete this.cards_[this.cards_.indexOf(card)]
         }
 
         // remove non cards_
         this.cards_ = this.cards_.filter(card => card instanceof Card)
 
-        return ret as Set.Cards
+        return ret as CardSet
+    }
+
+    /** Throws if a given card doesn't exist in the market */
+    public assert(cards: Card[]) {
+        for (const card of cards)
+            if (!this.cards_.includes(card))
+                throw Error(`Card ${card} doesn't exist in the market`)
     }
 }

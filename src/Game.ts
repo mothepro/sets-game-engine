@@ -1,6 +1,6 @@
 import Market from './Market'
 import Player from './Player'
-import Card, { Set } from './Card'
+import Card, { CardSet, Details } from './Card'
 import StrictEventEmitter from 'strict-event-emitter-types'
 import { EventEmitter } from 'events'
 import { shuffle } from './util'
@@ -40,7 +40,7 @@ export default class Game
     constructor({shoe = 1, rng, nextTimeout}: Partial<GameOptions> = {}) {
         super()
 
-        for (let i = 0; i < Card.COMBINATIONS * shoe; i++)
+        for (let i = 0; i < Details.combinations * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards, rng)
 
@@ -111,29 +111,29 @@ export default class Game
     }
 
     /** Whether a set of cards in the market is valid to take. */
-    public checkSet(...indexs: Set.Indexs): boolean {
-        return Card.isSet(...this.market.cards.filter(
-            (_, index) => indexs.indexOf(index) !== -1) as Set.Cards)
+    public check(...cards: CardSet): boolean {
+        this.market.assert(cards)
+        return Card.isSet(...cards)
     }
 
     /** Returns and removes some cards from the market. Updates market. */
-    public removeSet(...indexs: Set.Indexs): Set.Cards {
-        const ret = this.market.popSet(...indexs)
+    public take(...cards: CardSet): CardSet {
+        const ret = this.market.popSet(...cards)
         this.fillMarket()
         return ret
     }
 
-    public hint(): Set.Indexs {
-        const indexes = Card.getSet([...this.playableCards])
-        if (indexes)
-            return indexes
+    public hint(): CardSet {
+        const cards = Card.getSet([...this.playableCards])
+        if (cards)
+            return cards
         throw Error('No hint can be given since a set can not be made.')
     }
 
     /** Fill the market with cards. */
-    private fillMarket(): void {
+    protected fillMarket(): void {
         while (this.cards.length && !this.market.isFull)
-            this.market.pushCards(...this.cards.splice(0, 3) as Set.Cards)
+            this.market.pushCards(...this.cards.splice(0, 3) as CardSet)
         this.inProgress = !this.isDone
         this.emit(this.inProgress ? Events.marketFilled : Events.finish)
     }
