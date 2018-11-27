@@ -1,5 +1,5 @@
 import Player from './Player'
-import {Set} from './Card'
+import {CardSet} from './Card'
 
 export const enum Events {
     start,
@@ -18,5 +18,5 @@ export interface EventMap {
     [Events.playerUnbanned]: Player,
     [Events.playerAdded]: Player,
     [Events.marketFilled]: void,
-    [Events.marketGrab]: Set.Cards
+    [Events.marketGrab]: CardSet
 }

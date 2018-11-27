@@ -1,6 +1,6 @@
 import 'should'
 import CardsWithoutSet from './helpers/CardsWithoutSet'
-import Card, { Details } from '../src/Card'
+import Card, { Details, CardSet } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
 import { Events } from '../src/events'
@@ -41,55 +41,58 @@ describe('Game\'s Deck', () => {
 
     it('Should remove cards and keep order', () => {
         const game = new Game
-        const card1 = Card.make(1)
-        const card2 = Card.make(2)
-        const card3 = Card.make(3)
+
+        const set: CardSet = [
+            Card.make(1),
+            Card.make(2),
+            Card.make(3),
+        ]
+
         game.setCards([
-            Card.make(5),
-            card1,
-            Card.make(5),
-            card2,
-            Card.make(5),
-            Card.make(5),
-            card3,
-            Card.make(5),
+            CardsWithoutSet[0],
+            set[0],
+            CardsWithoutSet[1],
+            set[1],
+            CardsWithoutSet[2],
+            CardsWithoutSet[3],
+            set[2],
+            CardsWithoutSet[4],
         ])
         game.start()
 
         game.playableCards.length.should.eql(8)
 
         const market = game['market'] // Private member
-        const removedCards = market.popSet(1, 3, 6)
+        const removedCards = market.popSet(...set)
         market.cleanUp()
 
-        removedCards.length.should.eql(3)
-        removedCards.should.containEql(card1)
-        removedCards.should.containEql(card2)
-        removedCards.should.containEql(card3)
+        removedCards.should.eql(set)
         game.playableCards.length.should.eql(5)
-        for(const card of game.playableCards)
-            card.encoding.should.eql(5)
+        game.isDone.should.be.true()
     })
 
     it('Give me a hint', () => {
         const game = new Game
 
+        const set: CardSet = [
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.SOLID),
+        ]
+
         game.setCards([
-            Card.make(5),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-            Card.make(5),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
-            Card.make(12),
-            Card.make(12),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
-            Card.make(13),
+            CardsWithoutSet[0],
+            set[0],
+            CardsWithoutSet[1],
+            set[1],
+            CardsWithoutSet[2],
+            CardsWithoutSet[3],
+            set[2],
+            CardsWithoutSet[4],
         ])
         game.start()
 
-        const hint = game.hint()
-        hint.should.containEql(1)
-        hint.should.containEql(3)
-        hint.should.containEql(6)
+        game.hint().should.eql(set)
     })
 
     it('Don\'t give me a hint', () => {
@@ -117,7 +120,7 @@ describe('Players', () => {
         game.addPlayer(player).start()
 
         // keep taking this set, player should be banned eventually.
-        const interval = setInterval(() => player.takeSet(1, 2, 3), 10)
+        const interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
     })
 
     it('should ban and increase', done => {
@@ -142,7 +145,7 @@ describe('Players', () => {
         game.start()
 
         // keep taking this sets
-        const interval = setInterval(() => player.takeSet(1, 2, 3), 10)
+        const interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
     })
 
     it('should get the winners', () => {
@@ -150,19 +153,29 @@ describe('Players', () => {
         const player2 = new Player
         const game = new Game
 
+        const set1: CardSet = [
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
+        ]
+        const set2: CardSet = [
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
+        ]
+
         game.setCards([
-            Card.make(5),
-            Card.make(5),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-            Card.make(5),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
-            Card.make(5),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
-            Card.make(5),
-            Card.make(5),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
-            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
+            CardsWithoutSet[0],
+            set1[0],
+            CardsWithoutSet[1],
+            set1[1],
+            CardsWithoutSet[2],
+            CardsWithoutSet[3],
+            set1[2],
+            CardsWithoutSet[4],
+            set2[1],
+            set2[0],
+            set2[2],
         ])
         game.addPlayer(player1).addPlayer(player2).start()
 
@@ -170,13 +183,13 @@ describe('Players', () => {
         game.winners.should.containEql(player1)
         game.winners.should.containEql(player2)
 
-        player2.takeSet(2, 4, 6)
+        player2.takeSet(...set1)
 
         game.maxScore.should.eql(1)
         game.winners.length.should.eql(1)
         game.winners.should.containEql(player2)
 
-        player1.takeSet(2, 4, 6)
+        player1.takeSet(...set2)
 
         game.maxScore.should.eql(1)
         game.winners.length.should.eql(2)
@@ -188,32 +201,37 @@ describe('Players', () => {
         const game = new Game({nextTimeout: () => 1})
         const player = new Player
 
-        game.setCards([
-            Card.make(5),
+        const set: CardSet = [
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-            Card.make(5),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.HALF),
-            Card.make(5),
-            Card.make(5),
             new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
-            Card.make(5),
+        ]
+
+        game.setCards([
+            CardsWithoutSet[0],
+            set[0],
+            CardsWithoutSet[1],
+            set[1],
+            CardsWithoutSet[2],
+            CardsWithoutSet[3],
+            set[2],
+            CardsWithoutSet[4],
         ])
         game.addPlayer(player).start()
 
         game.on(Events.playerBanned, ({player: bannedPlayer}) => {
             player.should.eql(bannedPlayer)
-            player.takeSet(1, 3, 6).should.eql(false) // valid, but banned
+            player.takeSet(...set).should.eql(false) // valid, but banned
             player.score.should.eql(0)
         })
 
         game.on(Events.playerUnbanned, unbannedPlayer => {
             player.should.eql(unbannedPlayer)
-            player.takeSet(1, 3, 6).should.eql(true)
+            player.takeSet(...set).should.eql(true)
             player.score.should.eql(1)
             done()
         })
 
-        // invalid
-        player.takeSet(1, 2, 3)
+        player.takeSet(CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
     })
 })
