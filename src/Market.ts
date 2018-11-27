@@ -18,7 +18,7 @@ export default class Market {
     }
 
     /** Adds cards to market, also filling up any empty spots */
-    pushCards(cards: Set.Cards) {
+    pushCards(...cards: CardSet) {
         for (let i = 0; cards.length && i < this.cards_.length; i++)
             if (this.cards_[i] == undefined)
                 this.cards_[i] = cards.shift()!
@@ -27,7 +27,7 @@ export default class Market {
     }
 
     /** Removes a set from the deck, leaving empty spots */
-    popSet(...indexs: Set.Indexs): Set.Cards {
+    popSet(...cards: CardSet): CardSet {
         const ret = []
         for(const card of cards) {
             ret.push(card)
