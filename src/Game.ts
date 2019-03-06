@@ -28,7 +28,7 @@ export default class Game
 
     private readonly players_: Set<Player> = new Set
 
-    /** Playable cards. */
+    /** All cards in deck. */
     protected readonly cards: Card[] = []
 
     /** The cards shown the players. */
@@ -52,6 +52,12 @@ export default class Game
             })
             this.on(Events.playerBanned, ({player}) => player.timeout = nextTimeout(player.timeout, player))
         }
+
+        // clear hints for all players
+        this.on(Events.marketGrab, () => {
+            for(const player of this.players_)
+                player.hint.length = 0
+        })
     }
 
     get isDeckEmpty(): boolean {
@@ -108,7 +114,7 @@ export default class Game
 
     /** Whether a set of cards in the market is valid to take. */
     public check(...cards: CardSet): boolean {
-        this.market.assert(cards)
+        this.market.assert(...cards)
         return Card.isSet(...cards)
     }
 
@@ -119,11 +125,10 @@ export default class Game
         return ret
     }
 
-    public hint(): CardSet {
-        const cards = Card.getSet([...this.playableCards])
-        if (cards)
-            return cards
-        throw Error('No hint can be given since a set can not be made.')
+    public solution(): CardSet {
+        if (!this.market.solution)
+            throw Error('No hint can be given since a set can not be made.')
+        return this.market.solution
     }
 
     /** Fill the market with cards. */

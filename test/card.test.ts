@@ -1,5 +1,6 @@
 import 'should'
-import Card, { Details } from '../src/Card'
+import Card, { Details, CardSet } from '../src/Card'
+import Market from '../src/Market';
 
 describe('Card', () => {
     it('details should match', done => {
@@ -71,52 +72,67 @@ describe('Card', () => {
 
     describe('Having a set', () => {
         it('all same', done => {
-            Card.getSet([
+            const cards = [
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-            ]).should.not.be.false()
+            ]
+            const market = new Market
+            market.pushCards(...cards as CardSet)
+            market.solution.should.not.be.false()
             done()
         })
 
         it('all different', done => {
-            Card.getSet([
+            const cards = [
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.GREEN, Details.Shape.SQUARE, Details.Quantity.TWO, Details.Opacity.HALF),
                 new Card(Details.Color.RED, Details.Shape.TRIANGLE, Details.Quantity.THREE, Details.Opacity.SOLID),
-            ]).should.not.be.false()
+            ]
+            const market = new Market
+            market.pushCards(...cards as CardSet)
+            market.solution.should.not.be.false()
             done()
         })
 
         it('some same, some different', done => {
-            Card.getSet([
+            const cards = [
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.GREEN, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.EMPTY),
                 new Card(Details.Color.RED, Details.Shape.CIRCLE, Details.Quantity.THREE, Details.Opacity.EMPTY),
-            ]).should.not.be.false()
+            ]
+            const market = new Market
+            market.pushCards(...cards as CardSet)
+            market.solution.should.not.be.false()
             done()
         })
     })
 
     describe('Doesn\'t have a set', () => {
         it('two pairs', done => {
-            Card.getSet([
+            const cards = [
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
                 new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
-            ]).should.be.false()
+            ]
+            const market = new Market
+            market.pushCards(...cards as CardSet)
+            market.solution.should.be.false()
             done()
         })
 
         it('one pair', done => {
-            Card.getSet([
+            const cards = [
                 new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
                 new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
-            ]).should.be.false()
+            ]
+            const market = new Market
+            market.pushCards(...cards as CardSet)
+            market.solution.should.be.false()
             done()
         })
     })

@@ -1,25 +1,34 @@
-import { CardSet } from './Card'
+import Card, { CardSet } from './Card'
 import { Events } from './events'
 import Game from './Game'
 
 export default class Player {
-    public game!: Game
+    game!: Game
 
     /** Sets taken from the Game. */
-    public readonly sets: CardSet[] = []
+    readonly sets: CardSet[] = []
+
+    /** Cards which make up a set in the current market. */
+    readonly hint: Card[] = []
+
+    /** Number of wrong attempts */
+    bans = 0
+
+    /** Number of times a hint used */
+    hints = 0
 
     /** Whether not timed out from taking sets. */
     private banned = false
 
     /** If positive, number of ms the user will be blocked for after a wrong attempt. */
-    public timeout!: number
+    timeout!: number
 
     /** Number of collected Sets. */
-    public get score(): number {
+    get score(): number {
         return this.sets.length
     }
 
-    public get isBanned(): boolean {
+    get isBanned(): boolean {
         return this.banned
     }
 
@@ -28,7 +37,7 @@ export default class Player {
      * If not, ban the player from taking any sets for `this.timeout`
      * @returns true iff a set was taken.
      */
-    public takeSet(...cards: CardSet): boolean {
+    takeSet(...cards: CardSet): boolean {
         if (!this.banned) {
             if (this.game.check(...cards)) {
                 const set = this.game.take(...cards)
@@ -42,9 +51,23 @@ export default class Player {
                 }, this.timeout)
 
                 this.banned = true
+                this.bans++
                 this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
             }
         }
         return false
+    }
+
+    /**
+     * Adds a new card to the `hint` property if possible.
+     * @returns true iff a new cards was added the the `hint` property.
+     */
+    getNewHint(): boolean {
+        const ungivenHints = this.game.solution().filter(card => !this.hint.includes(card))
+        if (ungivenHints.length) {
+            this.hints++
+            this.hint.push( ungivenHints[Math.floor(Math.random() * ungivenHints.length)] )
+        }
+        return !!ungivenHints.length
     }
 }

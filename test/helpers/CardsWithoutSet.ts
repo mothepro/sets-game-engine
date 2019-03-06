@@ -1,4 +1,5 @@
-import Card, { Details } from '../../src/Card'
+import Card, { Details, CardSet } from '../../src/Card'
+import Market from '../../src/Market'
 
 const CardsWithoutSet: Card[] = [
     new Card(Details.Color.BLUE, Details.Shape.CIRCLE,  Details.Quantity.ONE,   Details.Opacity.EMPTY),
@@ -19,7 +20,9 @@ export default CardsWithoutSet
 
 describe('Test Helpers', () => {
     it('Should not make a set', done => {
-        Card.getSet(CardsWithoutSet).should.be.false()
+        const market = new Market
+        market.pushCards(...CardsWithoutSet as CardSet)
+        market.solution.should.be.false()
         done()
     })
 })

@@ -92,7 +92,7 @@ describe('Game\'s Deck', () => {
         ])
         game.start()
 
-        game.hint().should.eql(set)
+        game.solution().should.eql(set)
     })
 
     it('Don\'t give me a hint', () => {
@@ -100,7 +100,7 @@ describe('Game\'s Deck', () => {
         game.setCards(CardsWithoutSet)
         game.start()
 
-        ;(() => game.hint()).should.throw()
+        ;(() => game.solution()).should.throw()
     })
 })
 
@@ -112,6 +112,7 @@ describe('Players', () => {
         game.on(Events.playerBanned, ({player: bannedPlayer, timeout}) => {
             'number'.should.eql(typeof timeout)
             player.should.eql(bannedPlayer)
+            player.bans.should.eql(1)
 
             clearInterval(interval)
             done()
@@ -233,5 +234,73 @@ describe('Players', () => {
         })
 
         player.takeSet(CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
+    })
+
+    it('should give a single hint to player', () => {
+        const game = new Game
+        const player = new Player
+
+        const set: CardSet = [
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.SOLID),
+        ]
+
+        game.setCards([
+            CardsWithoutSet[0],
+            set[0],
+            CardsWithoutSet[1],
+            set[1],
+            CardsWithoutSet[2],
+            CardsWithoutSet[3],
+            set[2],
+            CardsWithoutSet[4],
+        ])
+        game.addPlayer(player)
+        game.start()
+
+        player.hints.should.eql(0)
+        player.hint.should.be.empty()
+
+        player.getNewHint().should.be.true()
+        player.hints.should.eql(1)
+        player.hint.should.have.size(1)
+        player.hint[0].should.equalOneOf(set)
+    })
+
+    it('should give all hints to player', () => {
+        const game = new Game
+        const player = new Player
+
+        const set: CardSet = [
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.EMPTY),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.HALF),
+            new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.TWO, Details.Opacity.SOLID),
+        ]
+
+        game.setCards([
+            CardsWithoutSet[0],
+            set[0],
+            CardsWithoutSet[1],
+            set[1],
+            CardsWithoutSet[2],
+            CardsWithoutSet[3],
+            set[2],
+            CardsWithoutSet[4],
+        ])
+        game.addPlayer(player)
+        game.start()
+
+        player.getNewHint().should.be.true()
+        player.getNewHint().should.be.true()
+        player.getNewHint().should.be.true()
+        player.getNewHint().should.be.false()
+        player.getNewHint().should.be.false()
+
+        player.hints.should.eql(3)
+        player.hint.should.have.size(3)
+        player.hint.should.containEql(set[0])
+        player.hint.should.containEql(set[1])
+        player.hint.should.containEql(set[2])
     })
 })

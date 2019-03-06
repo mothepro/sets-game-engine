@@ -1,10 +1,10 @@
 export type CardSet = [Card, Card, Card]
 
 export namespace Details {
-    export const enum Color { BLUE, RED, GREEN }
-    export const enum Shape { SQUARE, CIRCLE, TRIANGLE }
-    export const enum Quantity { ONE, TWO, THREE }
-    export const enum Opacity { SOLID, HALF, EMPTY }
+    export const enum Color     { BLUE,   RED,    GREEN }
+    export const enum Shape     { SQUARE, CIRCLE, TRIANGLE }
+    export const enum Quantity  { ONE,    TWO,    THREE }
+    export const enum Opacity   { SOLID,  HALF,   EMPTY }
 
     /** The max number of elements per particular detail. */
     export const size = 3
@@ -38,21 +38,6 @@ export default class Card {
             this.shape     * Details.size ** 1 +
             this.quantity  * Details.size ** 2 +
             this.opacity   * Details.size ** 3
-    }
-
-    /**
-     * The indexes of the cards given which make a valid set.
-     * Returns false if a valid set can not be made.
-     * O(n**3) >:(
-     */
-    public static getSet(cards: Card[]): CardSet | false {
-        if(cards.length >= 3)
-            for(let i = 0; i < cards.length; i++)
-                for(let j = i + 1; j < cards.length; j++)
-                    for(let k = j + 1; k < cards.length; k++)
-                        if(Card.isSet(cards[i], cards[j], cards[k]))
-                            return [cards[i], cards[j], cards[k]]
-        return false
     }
 
     /** Whether 3 cards make a valid set. */
