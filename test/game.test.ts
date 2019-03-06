@@ -12,7 +12,7 @@ describe('Game\'s Deck', () => {
     it('Market should fill up normally', () => {
         const game = new Game
 
-        game.playableCards.length.should.equal(0)
+        game.playableCards.should.be.empty()
         game.start()
 
         game.playableCards.length.should.be.oneOf(
@@ -28,7 +28,7 @@ describe('Game\'s Deck', () => {
         game.setCards(CardsWithoutSet)
         game.playableCards.should.be.empty()
         game.start()
-        game.playableCards.length.should.be.equal(CardsWithoutSet.length)
+        game.playableCards.should.have.size(CardsWithoutSet.length)
         game.isDone.should.be.true()
     })
 
@@ -60,14 +60,14 @@ describe('Game\'s Deck', () => {
         ])
         game.start()
 
-        game.playableCards.length.should.eql(8)
+        game.playableCards.should.have.size(8)
 
         const market = game['market'] // Private member
         const removedCards = market.popSet(...set)
         market.cleanUp()
 
         removedCards.should.eql(set)
-        game.playableCards.length.should.eql(5)
+        game.playableCards.should.have.size(5)
         game.isDone.should.be.true()
     })
 
@@ -187,13 +187,13 @@ describe('Players', () => {
         player2.takeSet(...set1)
 
         game.maxScore.should.eql(1)
-        game.winners.length.should.eql(1)
+        game.winners.should.have.size(1)
         game.winners.should.containEql(player2)
 
         player1.takeSet(...set2)
 
         game.maxScore.should.eql(1)
-        game.winners.length.should.eql(2)
+        game.winners.should.have.size(2)
         game.winners.should.containEql(player1)
         game.winners.should.containEql(player2)
     })
