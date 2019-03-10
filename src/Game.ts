@@ -53,7 +53,7 @@ export default class Game
             this.on(Events.playerBanned, ({player}) => player.timeout = nextTimeout(player.timeout, player))
         }
 
-        // clear hints for all players
+        // clear hints for all players when market is updated
         this.on(Events.marketGrab, () => {
             for(const player of this.players_)
                 player.hint.length = 0
@@ -86,7 +86,13 @@ export default class Game
         return this.players.filter(player => player.score == this.maxScore)
     }
 
-    public setCards(cards: Card[] | number[]) {
+    get solution(): CardSet {
+        if (!this.market.solution)
+            throw Error('No hint can be given since a set can not be made.')
+        return this.market.solution
+    }
+
+    setCards(cards: Card[] | number[]) {
         if (this.inProgress)
             throw Error('Can not load cards into a game in progress')
 
@@ -96,7 +102,7 @@ export default class Game
     }
 
     /** Adds a new player to the game before starting. */
-    public addPlayer(player: Player): this {
+    addPlayer(player: Player): this {
         if (!this.inProgress && !this.players_.has(player)) {
             player.game = this
             this.players_.add(player)
@@ -106,29 +112,23 @@ export default class Game
     }
 
     /** Ready up. */
-    public start() {
+    start() {
         this.emit(Events.start)
         this.fillMarket()
         return this
     }
 
     /** Whether a set of cards in the market is valid to take. */
-    public check(...cards: CardSet): boolean {
+    check(...cards: CardSet): boolean {
         this.market.assert(...cards)
         return Card.isSet(...cards)
     }
 
     /** Returns and removes some cards from the market. Updates market. */
-    public take(...cards: CardSet): CardSet {
+    take(...cards: CardSet): CardSet {
         const ret = this.market.popSet(...cards)
         this.fillMarket()
         return ret
-    }
-
-    public solution(): CardSet {
-        if (!this.market.solution)
-            throw Error('No hint can be given since a set can not be made.')
-        return this.market.solution
     }
 
     /** Fill the market with cards. */

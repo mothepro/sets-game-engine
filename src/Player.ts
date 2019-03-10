@@ -63,7 +63,7 @@ export default class Player {
      * @returns true iff a new cards was added the the `hint` property.
      */
     getNewHint(): boolean {
-        const ungivenHints = this.game.solution().filter(card => !this.hint.includes(card))
+        const ungivenHints = this.game.solution.filter(card => !this.hint.includes(card))
         if (ungivenHints.length) {
             this.hints++
             this.hint.push( ungivenHints[Math.floor(Math.random() * ungivenHints.length)] )

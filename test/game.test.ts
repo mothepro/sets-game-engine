@@ -92,7 +92,7 @@ describe('Game\'s Deck', () => {
         ])
         game.start()
 
-        game.solution().should.eql(set)
+        game.solution.should.eql(set)
     })
 
     it('Don\'t give me a hint', () => {
@@ -100,7 +100,7 @@ describe('Game\'s Deck', () => {
         game.setCards(CardsWithoutSet)
         game.start()
 
-        ;(() => game.solution()).should.throw()
+        ;(() => game.solution).should.throw()
     })
 })
 
