@@ -172,5 +172,7 @@ export default class Game
         this.market.cleanUp()
         this.inProgress = !this.isDone
         this.emit(this.inProgress ? Events.marketFilled : Events.finish)
+        if (!this.inProgress)
+            this.pause()
     }
 }
