@@ -37,6 +37,13 @@ export default class Game
     /** Whether the game is started and currently being played. */
     protected inProgress = false
 
+    private totalTime = 0
+
+    private paused = true
+
+    /** When the game was paused, `undefined` when not paused. */
+    private lastPause!: Date
+
     constructor({shoe = 1, rng, nextTimeout}: Partial<GameOptions> = {}) {
         super()
 
@@ -92,6 +99,40 @@ export default class Game
         return this.market.solution
     }
 
+    get elapsedTime(): number {
+        return this.totalTime + (this.paused ? 0 : Date.now() - this.lastPause.getTime())
+    }
+
+    /** Ready up. */
+    start() {
+        this.emit(Events.start)
+        this.fillMarket()
+        this.resume()
+        return this
+    }
+
+    /**
+     * The user switches focus away.
+     * Save the total time taken.
+     */
+    pause() {
+        if (!this.paused) {
+            this.totalTime += (Date.now() - this.lastPause.getTime())
+            this.paused = true
+        }
+    }
+
+    /**
+     * The user returns focus.
+     * Save the current time of continue.
+     */
+    resume() {
+        if (this.paused) {
+            this.lastPause = new Date
+            this.paused = false
+        }
+    }
+
     setCards(cards: Card[] | number[]) {
         if (this.inProgress)
             throw Error('Can not load cards into a game in progress')
@@ -108,13 +149,6 @@ export default class Game
             this.players_.add(player)
             this.emit(Events.playerAdded, player)
         }
-        return this
-    }
-
-    /** Ready up. */
-    start() {
-        this.emit(Events.start)
-        this.fillMarket()
         return this
     }
 

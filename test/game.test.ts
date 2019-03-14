@@ -4,11 +4,12 @@ import Card, { Details, CardSet } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
 import { Events } from '../src/events'
-
-const MARKET_SIZE = 9 // Default number of cards on screen
-const MARKET_INC = 3  // Size of Set
+import { doesNotReject } from 'assert';
 
 describe('Game\'s Deck', () => {
+    const MARKET_SIZE = 9 // Default number of cards on screen
+    const MARKET_INC = 3  // Size of Set
+
     it('Market should fill up normally', () => {
         const game = new Game
 
@@ -302,5 +303,58 @@ describe('Players', () => {
         player.hint.should.containEql(set[0])
         player.hint.should.containEql(set[1])
         player.hint.should.containEql(set[2])
+    })
+})
+
+describe('Game Timer', () => {
+    /**
+     * setTimeout isn't perfect, the delta is aaprox 6ms on modern machines.
+     *  @link https://developer.mozilla.org/en-US/docs/Web/API/Window.setTimeout#Notes
+     */
+    const TIMEOUT_DELTA = 6
+
+    const DELAY = 50
+
+    it('Game should keep track of time', done => {
+        const game = new Game
+        game.elapsedTime.should.eql(0)
+        game.start()
+
+        game.elapsedTime.should.be.approximately(0, TIMEOUT_DELTA)
+        setTimeout(() => {
+            game.elapsedTime.should.be.approximately(DELAY, TIMEOUT_DELTA)
+            game.isDone.should.be.false()
+            done()
+        }, DELAY)
+    })
+
+    it('Game should pause time', done => {
+        const game = new Game
+        game.start()
+
+        setTimeout(() => {
+            game.pause()
+            const elapsed = game.elapsedTime
+            elapsed.should.be.approximately(DELAY, TIMEOUT_DELTA)
+            setTimeout(() => {
+                game.elapsedTime.should.eql(elapsed)
+                done()
+            }, DELAY)
+        }, DELAY)
+    })
+
+    it('Game should resume time', done => {
+        const game = new Game
+        game.start()
+        game.pause()
+
+        setTimeout(() => {
+            game.resume()
+            game.elapsedTime.should.be.approximately(0, TIMEOUT_DELTA)
+            setTimeout(() => {
+                game.elapsedTime.should.be.approximately(DELAY, TIMEOUT_DELTA)
+                done()
+            }, DELAY)
+        }, DELAY)
     })
 })
