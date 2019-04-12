@@ -3,8 +3,7 @@ import CardsWithoutSet from './helpers/CardsWithoutSet'
 import Card, { Details, CardSet } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
-import { Events } from '../src/events'
-import { doesNotReject } from 'assert';
+import { doesNotReject } from 'assert'
 
 describe('Game\'s Deck', () => {
     const MARKET_SIZE = 9 // Default number of cards on screen
@@ -110,7 +109,7 @@ describe('Players', () => {
         const game = new Game({nextTimeout: () => 1})
         const player = new Player
 
-        game.on(Events.playerBanned, ({player: bannedPlayer, timeout}) => {
+        game.playerBanned.on(({player: bannedPlayer, timeout}) => {
             'number'.should.eql(typeof timeout)
             player.should.eql(bannedPlayer)
             player.bans.should.eql(1)
@@ -134,7 +133,7 @@ describe('Players', () => {
         const player = new Player
         game.addPlayer(player)
 
-        game.on(Events.playerBanned, ({player: bannedPlayer, timeout}) => {
+        game.playerBanned.on(({player: bannedPlayer, timeout}) => {
             timeout.should.eql(expectedTimeouts.shift())
             player.should.eql(bannedPlayer)
 
@@ -221,20 +220,22 @@ describe('Players', () => {
         ])
         game.addPlayer(player).start()
 
-        game.on(Events.playerBanned, ({player: bannedPlayer}) => {
-            player.should.eql(bannedPlayer)
-            player.takeSet(...set).should.eql(false) // valid, but banned
-            player.score.should.eql(0)
+        setImmediate(() => { // wait until the promises have been resolved
+            game.playerBanned.on(({player: bannedPlayer}) => {
+                player.should.eql(bannedPlayer)
+                player.takeSet(...set).should.eql(false) // valid, but banned
+                player.score.should.eql(0)
+            })
+    
+            game.playerUnbanned.on(unbannedPlayer => {
+                player.should.eql(unbannedPlayer)
+                player.takeSet(...set).should.eql(true)
+                player.score.should.eql(1)
+                done()
+            })
+    
+            player.takeSet(CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
         })
-
-        game.on(Events.playerUnbanned, unbannedPlayer => {
-            player.should.eql(unbannedPlayer)
-            player.takeSet(...set).should.eql(true)
-            player.score.should.eql(1)
-            done()
-        })
-
-        player.takeSet(CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
     })
 
     it('should give a single hint to player', () => {

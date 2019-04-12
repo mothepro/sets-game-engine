@@ -1,10 +1,8 @@
 import Market from './Market'
 import Player from './Player'
 import Card, { CardSet, Details } from './Card'
-import StrictEventEmitter from 'strict-event-emitter-types'
-import { EventEmitter } from 'events'
 import { shuffle } from './util'
-import { EventMap, Events } from './events'
+import Emitter from 'fancy-emitter'
 
 type Constructor<T> = { new(...args: any[]): T }
 
@@ -23,10 +21,13 @@ interface GameOptions {
     nextTimeout: (oldTimeout: number, player: Player) => number
 }
 
-export default class Game
-    extends (EventEmitter as Constructor<StrictEventEmitter<EventEmitter, EventMap>>) {
+export default class Game {
 
     private readonly players_: Set<Player> = new Set
+
+    private totalTime = 0
+
+    private paused = true
 
     /** All cards in deck. */
     protected readonly cards: Card[] = []
@@ -37,34 +38,38 @@ export default class Game
     /** Whether the game is started and currently being played. */
     protected inProgress = false
 
-    private totalTime = 0
-
-    private paused = true
-
     /** When the game was paused, `undefined` when not paused. */
     private lastPause!: Date
 
-    constructor({shoe = 1, rng, nextTimeout}: Partial<GameOptions> = {}) {
-        super()
+    /** When the game is ready. */
+    readonly started = new Emitter
 
+    /** When the game is completed. */
+    readonly finished = new Emitter
+
+    /** When a player is banned. */
+    readonly playerBanned = new Emitter<{player: Player, timeout: number}>()
+
+    /** When a player is unbanned. */
+    readonly playerUnbanned = new Emitter<Player>()
+
+    /** When a player is added to the game. */
+    readonly playerAdded = new Emitter<Player>()
+
+    /** When the market has new cards in it. */
+    readonly marketFilled = new Emitter
+
+    /** When cards are taken from the market. */
+    readonly marketGrab = new Emitter<CardSet>()
+
+    constructor({shoe = 1, rng, nextTimeout}: Partial<GameOptions> = {}) {
         for (let i = 0; i < Details.combinations * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards, rng)
 
-        if (nextTimeout) {
-            // reset timeouts
-            this.on(Events.start, () => {
-                for(const player of this.players_)
-                    player.timeout = nextTimeout(0, player)
-            })
-            this.on(Events.playerBanned, ({player}) => player.timeout = nextTimeout(player.timeout, player))
-        }
-
-        // clear hints for all players when market is updated
-        this.on(Events.marketGrab, () => {
-            for(const player of this.players_)
-                player.hint.length = 0
-        })
+        if (nextTimeout)
+            this.resetTimeouts(nextTimeout)
+        this.clearHintsWhenMarketUpdated()
     }
 
     get isDeckEmpty(): boolean {
@@ -104,11 +109,12 @@ export default class Game
     }
 
     /** Ready up. */
-    start() {
-        this.emit(Events.start)
+    async start() {
+        this.started.activate()
         this.fillMarket()
         this.resume()
-        return this
+        await this.finished.next
+        this.pause()
     }
 
     /**
@@ -147,7 +153,7 @@ export default class Game
         if (!this.inProgress && !this.players_.has(player)) {
             player.game = this
             this.players_.add(player)
-            this.emit(Events.playerAdded, player)
+            this.playerAdded.activate(player)
         }
         return this
     }
@@ -171,8 +177,20 @@ export default class Game
             this.market.pushCards(...this.cards.splice(0, 3) as CardSet)
         this.market.cleanUp()
         this.inProgress = !this.isDone
-        this.emit(this.inProgress ? Events.marketFilled : Events.finish)
-        if (!this.inProgress)
-            this.pause()
+        ;(this.inProgress ? this.marketFilled : this.finished).activate()
+    }
+
+    private async clearHintsWhenMarketUpdated() {
+        for await (let _ of this.marketGrab.all)
+            for(const player of this.players_)
+                player.hint.length = 0
+    }
+
+    private async resetTimeouts(nextTimeout: GameOptions['nextTimeout']) {
+        await this.started.next
+        for(const player of this.players_)
+            player.timeout = nextTimeout(0, player)
+        for await (const {player} of this.playerBanned.all)
+            player.timeout = nextTimeout(player.timeout, player)
     }
 }

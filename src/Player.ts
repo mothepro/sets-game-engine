@@ -1,5 +1,4 @@
 import Card, { CardSet } from './Card'
-import { Events } from './events'
 import Game from './Game'
 
 export default class Player {
@@ -42,17 +41,17 @@ export default class Player {
             if (this.game.check(...cards)) {
                 const set = this.game.take(...cards)
                 this.sets.push(set)
-                this.game.emit(Events.marketGrab, set)
+                this.game.marketGrab.activate(set)
                 return true
             } else if (this.timeout) {
                 setTimeout(() => {
                     this.banned = false
-                    this.game.emit(Events.playerUnbanned, this)
+                    this.game.playerUnbanned.activate(this)
                 }, this.timeout)
 
                 this.banned = true
                 this.bans++
-                this.game.emit(Events.playerBanned, {player: this, timeout: this.timeout})
+                this.game.playerBanned.activate({player: this, timeout: this.timeout})
             }
         }
         return false
