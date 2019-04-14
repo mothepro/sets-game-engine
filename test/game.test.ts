@@ -3,7 +3,19 @@ import CardsWithoutSet from './helpers/CardsWithoutSet'
 import Card, { Details, CardSet } from '../src/Card'
 import Player from '../src/Player'
 import Game from '../src/Game'
-import { doesNotReject } from 'assert'
+
+type AsyncFunction<T = any> = (...args: any[]) => Promise<T>
+
+/**
+ * A small utility function which returns promise
+ * that resolves with the execution of all the async functions.
+ */
+function asyncRunner(...fns: AsyncFunction[]) {
+    const promises = []
+    for(const fn of fns)
+        promises.push(fn())
+    return Promise.all(promises)
+}
 
 describe('Game\'s Deck', () => {
     const MARKET_SIZE = 9 // Default number of cards on screen
@@ -124,8 +136,9 @@ describe('Players', () => {
         const interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
     })
 
-    it('should ban and increase', done => {
+    it('should ban and increase', async () => {
         const expectedTimeouts = [1, 2, 4]
+        let interval: NodeJS.Timeout
 
         const game = new Game({
             nextTimeout: (old) => old == 0 ? 1 : old * 2
@@ -133,20 +146,25 @@ describe('Players', () => {
         const player = new Player
         game.addPlayer(player)
 
-        game.playerBanned.on(({player: bannedPlayer, timeout}) => {
-            timeout.should.eql(expectedTimeouts.shift())
-            player.should.eql(bannedPlayer)
+        return asyncRunner(
+            async () => {
+                for await (const {player: bannedPlayer, timeout} of game.playerBanned.all) {
+                    timeout.should.eql(expectedTimeouts.shift())
+                    player.should.eql(bannedPlayer)
+                    if (!expectedTimeouts.length)
+                        break
+                }
+                expectedTimeouts.should.be.empty()
+                game.playerBanned.count.should.eql(3)
+                clearInterval(interval!)
+            },
+            async () => {
+                game.start()
 
-            if(!expectedTimeouts.length) {
-                clearInterval(interval)
-                done()
-            }
-        })
-
-        game.start()
-
-        // keep taking this sets
-        const interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
+                // keep taking this sets
+                interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
+            },
+        )
     })
 
     it('should get the winners', () => {

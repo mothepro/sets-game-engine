@@ -8,7 +8,9 @@
   "scripts": {
     "pretest": "tsc",
     "postinstall": "tsc",
-    "test": "mocha dist/test"
+    "test": "mocha dist/test",
+    "publish-please": "publish-please",
+    "prepublishOnly": "publish-please guard"
   },
   "author": {
     "name": "Maurice Prosper",
@@ -20,7 +22,7 @@
     "@types/node": "^10.10.3",
     "@types/should": "^13.0.0",
     "@types/shuffle-array": "0.0.28",
-    "fancy-emitter": "0.0.2",
+    "fancy-emitter": "0.0.6",
     "typescript": "^3.0.3"
   },
   "devDependencies": {
