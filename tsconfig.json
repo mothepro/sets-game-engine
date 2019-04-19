@@ -1,16 +1,11 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "esnext",
     "strict": true,
     "sourceMap": true,
-    "outDir": "dist/",
+    "outDir": "dist",
     "declaration": true,
-    "downlevelIteration": true,
-    "lib": ["esnext"]
-  },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+    "lib": ["esnext", "es2018", "esnext.asynciterable"]
+  }
 }
