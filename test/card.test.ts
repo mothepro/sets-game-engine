@@ -1,6 +1,6 @@
 import 'should'
 import Card, { Details, CardSet } from '../src/Card'
-import Market from '../src/Market';
+import Market from '../src/Market'
 
 describe('Card', () => {
     it('details should match', done => {

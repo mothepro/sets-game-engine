@@ -1,3 +1,4 @@
+import 'should'
 import Card, { Details, CardSet } from '../../src/Card'
 import Market from '../../src/Market'
 

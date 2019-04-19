@@ -1,10 +1,8 @@
+import Emitter from 'fancy-emitter'
 import Market from './Market'
 import Player from './Player'
 import Card, { CardSet, Details } from './Card'
 import { shuffle } from './util'
-import Emitter from 'fancy-emitter'
-
-type Constructor<T> = { new(...args: any[]): T }
 
 interface GameOptions {
     /** Size of the deck. */
@@ -181,7 +179,7 @@ export default class Game {
     }
 
     private async clearHintsWhenMarketUpdated() {
-        for await (let _ of this.marketGrab.all)
+        for await (let _ of this.marketGrab.future)
             for(const player of this.players_)
                 player.hint.length = 0
     }
@@ -190,7 +188,7 @@ export default class Game {
         await this.started.next
         for(const player of this.players_)
             player.timeout = nextTimeout(0, player)
-        for await (const {player} of this.playerBanned.all)
-            player.timeout = nextTimeout(player.timeout, player)
+        for await (const {player, timeout} of this.playerBanned.future)
+            player.timeout = nextTimeout(timeout, player)
     }
 }

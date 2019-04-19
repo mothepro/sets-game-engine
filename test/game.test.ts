@@ -148,7 +148,7 @@ describe('Players', () => {
 
         return asyncRunner(
             async () => {
-                for await (const {player: bannedPlayer, timeout} of game.playerBanned.all) {
+                for await (const {player: bannedPlayer, timeout} of game.playerBanned.future) {
                     timeout.should.eql(expectedTimeouts.shift())
                     player.should.eql(bannedPlayer)
                     if (!expectedTimeouts.length)
@@ -156,7 +156,6 @@ describe('Players', () => {
                 }
                 expectedTimeouts.should.be.empty()
                 game.playerBanned.count.should.eql(3)
-                clearInterval(interval!)
             },
             async () => {
                 game.start()
@@ -164,7 +163,7 @@ describe('Players', () => {
                 // keep taking this sets
                 interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
             },
-        )
+        ).then(() => clearInterval(interval!))
     })
 
     it('should get the winners', () => {
