@@ -138,7 +138,7 @@ describe('Players', () => {
 
     it('should ban and increase', async () => {
         const expectedTimeouts = [1, 2, 4]
-        let interval: NodeJS.Timeout
+        let interval: NodeJS.Timer
 
         const game = new Game({
             nextTimeout: (old) => old == 0 ? 1 : old * 2
@@ -161,7 +161,11 @@ describe('Players', () => {
                 game.start()
 
                 // keep taking this sets
-                interval = setInterval(() => player.takeSet(game.playableCards[0], game.playableCards[1], game.playableCards[3]), 10)
+                interval = setInterval(() => player.takeSet(
+                    game.playableCards[0],
+                    game.playableCards[1],
+                    game.playableCards[3]
+                ), 10)
             },
         ).then(() => clearInterval(interval!))
     })
@@ -243,14 +247,14 @@ describe('Players', () => {
                 player.takeSet(...set).should.eql(false) // valid, but banned
                 player.score.should.eql(0)
             })
-    
+
             game.playerUnbanned.on(unbannedPlayer => {
                 player.should.eql(unbannedPlayer)
                 player.takeSet(...set).should.eql(true)
                 player.score.should.eql(1)
                 done()
             })
-    
+
             player.takeSet(CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
         })
     })

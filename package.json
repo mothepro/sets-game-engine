@@ -21,8 +21,8 @@
     "@types/node": "^10.10.3",
     "@types/should": "^13.0.0",
     "@types/shuffle-array": "0.0.28",
-    "fancy-emitter": "0.0.7",
-    "typescript": "^3.0.3"
+    "fancy-emitter": "0.0.8",
+    "typescript": "^3.4.5"
   },
   "devDependencies": {
     "mocha": "^5.0.0",

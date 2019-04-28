@@ -4,21 +4,6 @@ import Player from './Player'
 import Card, { CardSet, Details } from './Card'
 import { shuffle } from './util'
 
-interface GameOptions {
-    /** Size of the deck. */
-    shoe: number
-
-    /** A random number generator for generating the cards. */
-    rng: (max: number) => number
-
-    /**
-     * Calculate the next time out for a player.
-     * When the game starts this function is used to set the timeout for each player.
-     * The `oldTimeout` parameter is set to 0 for this case.
-     */
-    nextTimeout: (oldTimeout: number, player: Player) => number
-}
-
 export default class Game {
 
     private readonly players_: Set<Player> = new Set
@@ -60,7 +45,20 @@ export default class Game {
     /** When cards are taken from the market. */
     readonly marketGrab = new Emitter<CardSet>()
 
-    constructor({shoe = 1, rng, nextTimeout}: Partial<GameOptions> = {}) {
+    constructor({shoe = 1, rng, nextTimeout}: {
+        /** Size of the deck. */
+        shoe?: number,
+
+        /** A random number generator for generating the cards. */
+        rng?: (max: number) => number,
+
+        /**
+         * Calculate the next time out for a player.
+         * When the game starts this function is used to set the timeout for each player.
+         * The `oldTimeout` parameter is set to 0 for this case.
+         */
+        nextTimeout?: (oldTimeout: number, player: Player) => number,
+    } = {}) {
         for (let i = 0; i < Details.combinations * shoe; i++)
             this.cards.push(Card.make(i))
         shuffle(this.cards, rng)
@@ -184,7 +182,7 @@ export default class Game {
                 player.hint.length = 0
     }
 
-    private async resetTimeouts(nextTimeout: GameOptions['nextTimeout']) {
+    private async resetTimeouts(nextTimeout: NonNullable<NonNullable<ConstructorParameters<typeof Game>[0]>['nextTimeout']>) {
         await this.started.next
         for(const player of this.players_)
             player.timeout = nextTimeout(0, player)
