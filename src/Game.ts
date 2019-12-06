@@ -2,7 +2,7 @@ import { SafeEmitter } from 'fancy-emitter'
 import Market from './Market'
 import Player from './Player'
 import Card, { CardSet, Details } from './Card'
-import { shuffle } from './util'
+import shuffle from './shuffle'
 
 export default class Game {
 
