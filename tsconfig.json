@@ -13,5 +13,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-  }
+  },
+  "exclude": ["dist/"]
 }

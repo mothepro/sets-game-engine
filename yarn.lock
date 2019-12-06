@@ -69,10 +69,10 @@ escape-string-regexp@1.0.5:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
-fancy-emitter@0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/fancy-emitter/-/fancy-emitter-0.0.8.tgz#9da85daadd3f8c41f8c5876dbc3c1e2bd251ad88"
-  integrity sha512-ViNkTkM0+sNaqgf/moB7MNoRF6vEhbfb/h1kU09ANi9tUBBNArhx7FBRA7C7IKEhi6xqDjU6uFOkdh/gcPb97w==
+fancy-emitter@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/fancy-emitter/-/fancy-emitter-1.1.1.tgz#34c01b4b41016e03c6dfd9df1f62a48fc175e5c8"
+  integrity sha512-h0QiTw9vHVktEy05AO5/V8DDzA5jtZUdDBjqMY4O2kdyQm9Nk7U91eClVSiLalxU4ZtnvSXHIVlTNYaZ1Hc9WQ==
 
 fs.realpath@^1.0.0:
   version "1.0.0"
