@@ -4,10 +4,10 @@ import Player from './Player'
 import Card, { CardSet, Details } from './Card'
 import shuffle from './shuffle'
 
-export default class Game {
+/** Calculator the next time out for a player. */
+type NextTimeout = (oldTimeout: number, player: Player) => number
 
-  private readonly players_: Set<Player> = new Set
-
+export default class {
   private totalTime = 0
 
   private paused = true
@@ -24,6 +24,9 @@ export default class Game {
   /** When the game was paused, `undefined` when not paused. */
   private lastPause!: Date
 
+  /** Players in game. */
+  readonly players: Player[] = []
+  
   /** When the game is ready. */
   readonly started = new SafeSingleEmitter
 
@@ -57,11 +60,14 @@ export default class Game {
      * When the game starts this function is used to set the timeout for each player.
      * The `oldTimeout` parameter is set to 0 for this case.
      */
-    nextTimeout?: (oldTimeout: number, player: Player) => number,
+    nextTimeout?: NextTimeout
   } = {}) {
     for (let i = 0; i < Details.combinations * shoe; i++)
       this.cards.push(Card.make(i))
     shuffle(this.cards, rng)
+
+    for (let i = 0; i < players; i++)
+      this.players.push(new Player)
 
     if (nextTimeout)
       this.resetTimeouts(nextTimeout)
@@ -83,10 +89,6 @@ export default class Game {
 
   get maxScore(): number {
     return this.players.reduce((maxScore, player) => Math.max(maxScore, player.score), 0)
-  }
-
-  get players(): Player[] {
-    return [...this.players_]
   }
 
   /** Currently winning players. */
@@ -144,16 +146,6 @@ export default class Game {
       this.cards.push(typeof card === 'number' ? Card.make(card) : card)
   }
 
-  /** Adds a new player to the game before starting. */
-  addPlayer(player: Player): this {
-    if (!this.inProgress && !this.players_.has(player)) {
-      player.game = this
-      this.players_.add(player)
-      this.playerAdded.activate(player)
-    }
-    return this
-  }
-
   /** Whether a set of cards in the market is valid to take. */
   check(...cards: CardSet): boolean {
     this.market.assert(...cards)
@@ -178,13 +170,13 @@ export default class Game {
 
   private async clearHintsWhenMarketUpdated() {
     for await (let _ of this.marketGrab)
-      for (const player of this.players_)
+      for (const player of this.players)
         player.hint.length = 0
   }
 
-  private async resetTimeouts(nextTimeout: NonNullable<NonNullable<ConstructorParameters<typeof Game>[0]>['nextTimeout']>) {
+  private async resetTimeouts(nextTimeout: NextTimeout) {
     await this.started.event
-    for (const player of this.players_)
+    for (const player of this.players)
       player.timeout = nextTimeout(0, player)
     for await (const { player, timeout } of this.playerBanned)
       player.timeout = nextTimeout(timeout, player)
