@@ -1,4 +1,4 @@
-import { SafeEmitter } from 'fancy-emitter'
+import { SafeEmitter, SafeSingleEmitter } from 'fancy-emitter'
 import Market from './Market'
 import Player from './Player'
 import Card, { CardSet, Details } from './Card'
@@ -25,10 +25,10 @@ export default class Game {
   private lastPause!: Date
 
   /** When the game is ready. */
-  readonly started = new SafeEmitter
+  readonly started = new SafeSingleEmitter
 
   /** When the game is completed. */
-  readonly finished = new SafeEmitter
+  readonly finished = new SafeSingleEmitter
 
   /** When a player is banned. */
   readonly playerBanned = new SafeEmitter<{ player: Player, timeout: number }>()
@@ -109,7 +109,7 @@ export default class Game {
     this.started.activate()
     this.fillMarket()
     this.resume()
-    await this.finished.next
+    await this.finished.event
     this.pause()
   }
 
@@ -183,7 +183,7 @@ export default class Game {
   }
 
   private async resetTimeouts(nextTimeout: NonNullable<NonNullable<ConstructorParameters<typeof Game>[0]>['nextTimeout']>) {
-    await this.started.next
+    await this.started.event
     for (const player of this.players_)
       player.timeout = nextTimeout(0, player)
     for await (const { player, timeout } of this.playerBanned)
