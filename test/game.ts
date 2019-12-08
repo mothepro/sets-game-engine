@@ -1,8 +1,8 @@
 import 'should'
-import CardsWithoutSet from './helpers/CardsWithoutSet'
-import Card, { Details, CardSet } from '../src/Card'
-import Player from '../src/Player'
-import Game from '../src/Game'
+import CardsWithoutSet from './helpers/CardsWithoutSet.js'
+import Card, { Details, CardSet } from '../src/Card.js'
+import Player from '../src/Player.js'
+import Game from '../src/Game.js'
 
 type AsyncFunction<T = any> = (...args: any[]) => Promise<T>
 

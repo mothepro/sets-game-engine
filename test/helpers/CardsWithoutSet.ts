@@ -1,6 +1,6 @@
 import 'should'
-import Card, { Details, CardSet } from '../../src/Card'
-import Market from '../../src/Market'
+import Card, { Details, CardSet } from '../../src/Card.js'
+import Market from '../../src/Market.js'
 
 const CardsWithoutSet: Card[] = [
   new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),

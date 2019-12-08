@@ -1,5 +1,5 @@
-import Card, { Details, CardSet } from './src/Card'
-import Game from './src/Game'
-import Player from './src/Player'
+import Card, { Details, CardSet } from './src/Card.js'
+import Game from './src/Game.js'
+import Player from './src/Player.js'
 
 export { Card, Game, Player, Details, CardSet }

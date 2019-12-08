@@ -1,8 +1,8 @@
 import { SafeEmitter, SafeSingleEmitter } from 'fancy-emitter'
-import Market from './Market'
-import Player from './Player'
-import Card, { CardSet, Details } from './Card'
-import shuffle from './shuffle'
+import Market from './Market.js'
+import Player from './Player.js'
+import Card, { CardSet, Details } from './Card.js'
+import shuffle from './shuffle.js'
 
 /** Calculator the next time out for a player. */
 type NextTimeout = (oldTimeout: number, player: Player) => number
@@ -26,7 +26,7 @@ export default class {
 
   /** Players in game. */
   readonly players: Player[] = []
-  
+
   /** When the game is ready. */
   readonly started = new SafeSingleEmitter
 
