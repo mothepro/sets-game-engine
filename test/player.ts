@@ -9,7 +9,7 @@ const keepTaking = (player: Player, game: Game) =>
 
 describe('Players', () => {
   it('should ban', done => {
-    const player = new Player(() => 1, () => 0, () => 0, () => 0),
+    const player = new Player,
       game = new Game([player])
 
     player.ban.on(() => {
@@ -25,9 +25,7 @@ describe('Players', () => {
     const expectedTimeouts = [1, 2, 4]
     let interval: NodeJS.Timer
 
-    const player = new Player(
-      (player) => player.timeout == 0 ? 1 : player.timeout * 2,
-      () => 0, () => 0, () => 0),
+    const player = new Player((player) => player.timeout == 0 ? 1 : player.timeout * 2),
       game = new Game([player])
 
     return asyncRunner(
@@ -46,83 +44,77 @@ describe('Players', () => {
     ).then(() => clearInterval(interval!))
   })
 
-  it('should get the winners', () => {
+  it('should get the winners', async done => {
     const set1: CardSet = [
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
     ],
-    set2: CardSet = [
-      new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
-      new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
-      new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
-    ],
-    player1 = new Player(() => 0, () => 0, () => 0, () => 0),
-    player2 = new Player(() => 0, () => 0, () => 0, () => 0),
-    game = new Game([player1, player2], undefined, [
-      CardsWithoutSet[0],
-      set1[0],
-      CardsWithoutSet[1],
-      set1[1],
-      CardsWithoutSet[2],
-      CardsWithoutSet[3],
-      set1[2],
-      CardsWithoutSet[4],
-      set2[1],
-      set2[0],
-      set2[2],
-    ])
+      set2: CardSet = [
+        new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.EMPTY),
+        new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.HALF),
+        new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.SOLID),
+      ],
+      player1 = new Player,
+      player2 = new Player,
+      game = new Game([player1, player2], undefined, [
+        ...set1,
+        ...set2,
+        ...CardsWithoutSet.slice(0, 3),
+      ])
 
     game.maxScore.should.eql(0)
     game.winners.should.containEql(player1)
     game.winners.should.containEql(player2)
 
     game.takeSet(player2, ...set1)
-    
+    await player2.take.next
+
     game.maxScore.should.eql(1)
     game.winners.should.have.size(1)
     game.winners.should.containEql(player2)
-    
+
     game.takeSet(player1, ...set2)
+    await game.finished.event
 
     game.maxScore.should.eql(1)
     game.winners.should.have.size(2)
     game.winners.should.containEql(player1)
     game.winners.should.containEql(player2)
+    done()
   })
 
-  it('should not be able to play during ban', done => {
+  it('should not be able to play during ban', async done => {
     const set: CardSet = [
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
     ],
-      player = new Player(() => 1, () => 0, () => 0, () => 0),
+      player = new Player,
       game = new Game([player], undefined, [
-      CardsWithoutSet[0],
-      set[0],
-      CardsWithoutSet[1],
-      set[1],
-      CardsWithoutSet[2],
-      CardsWithoutSet[3],
-      set[2],
-      CardsWithoutSet[4],
-    ])
+        CardsWithoutSet[0],
+        set[0],
+        CardsWithoutSet[1],
+        set[1],
+        CardsWithoutSet[2],
+        CardsWithoutSet[3],
+        set[2],
+        CardsWithoutSet[4],
+      ])
 
-    setImmediate(() => { // wait until the promises have been resolved
-      player.ban.on(() => {
-        game.takeSet(player, ...set).should.eql(false) // valid, but banned
-        player.takenCards.should.have.size(0)
-      })
+    game.takeSet(player, CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
+    await player.ban.next
 
-      player.unban.on(() => {
-        game.takeSet(player, ...set).should.eql(true)
-        player.takenCards.should.have.size(1)
-        done()
-      })
+    // valid, but banned
+    game.takeSet(player, ...set).should.be.false() 
+    player.takenCards.should.have.size(0)
 
-      game.takeSet(player, CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
-    })
+    await player.unban.next
+    game.takeSet(player, ...set).should.be.true()
+
+    await player.take.next
+    player.takenCards.should.have.size(1)
+    done()
   })
 
   it('should give a single hint to player', () => {
@@ -131,7 +123,7 @@ describe('Players', () => {
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.HALF),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.SOLID),
     ],
-      player = new Player(() => 1, () => 0, () => 0, () => 0),
+      player = new Player,
       game = new Game([player], undefined, [
         CardsWithoutSet[0],
         set[0],
@@ -158,7 +150,7 @@ describe('Players', () => {
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.HALF),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.SOLID),
     ],
-      player = new Player(() => 1, () => 0, () => 0, () => 0),
+      player = new Player,
       game = new Game([player], undefined, [
         CardsWithoutSet[0],
         set[0],
