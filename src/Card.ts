@@ -1,4 +1,4 @@
-import { Color, Shape, Quantity, Opacity, size } from './Details.js'
+import { Color, Shape, Quantity, Opacity, SIZE } from './Details.js'
 
 export type CardSet = [Card, Card, Card]
 
@@ -17,10 +17,10 @@ export default class Card {
    * and the others are calculated on the fly.
    */
   get encoding(): number {
-    return this.color * size ** 0 +
-      this.shape      * size ** 1 +
-      this.quantity   * size ** 2 +
-      this.opacity    * size ** 3
+    return this.color * SIZE ** 0 +
+      this.shape      * SIZE ** 1 +
+      this.quantity   * SIZE ** 2 +
+      this.opacity    * SIZE ** 3
   }
 
   /** Whether 3 cards make a valid set. */
@@ -37,10 +37,10 @@ export default class Card {
    */
   public static make = (encoding: number): Card =>
     new Card(
-      Math.trunc(encoding / size ** 0) % size as Color,
-      Math.trunc(encoding / size ** 1) % size as Shape,
-      Math.trunc(encoding / size ** 2) % size as Quantity,
-      Math.trunc(encoding / size ** 3) % size as Opacity,
+      Math.trunc(encoding / SIZE ** 0) % SIZE as Color,
+      Math.trunc(encoding / SIZE ** 1) % SIZE as Shape,
+      Math.trunc(encoding / SIZE ** 2) % SIZE as Quantity,
+      Math.trunc(encoding / SIZE ** 3) % SIZE as Opacity,
     )
 
   /** A unique value comparing the difference in the card's  */

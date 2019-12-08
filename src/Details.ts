@@ -22,10 +22,10 @@ export const enum Opacity {
 }
 
 /** The max number of elements per particular detail. */
-export const size = 3
+export const SIZE = 3
 
 /** The total number of unique details. */
-export const count = 4
+export const COUNT = 4
 
 /** Number of total different combinations of cards. */
-export const combinations = size ** count
+export const COMOBINATIONS = SIZE ** COUNT
