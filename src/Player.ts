@@ -1,72 +1,91 @@
+import { SafeEmitter } from 'fancy-emitter'
 import Card, { CardSet } from './Card.js'
-import Game from './Game.js'
 
+/** @readonly Represents the state of each player in the game. */
 export default class Player {
-  game!: Game
-
-  /** Sets taken from the Game. */
-  readonly sets: CardSet[] = []
-
-  /** Cards which make up a set in the current market. */
-  readonly hint: Card[] = []
-
-  /** Number of wrong attempts */
-  bans = 0
-
-  /** Number of times a hint used */
-  hints = 0
-
-  /** Whether not timed out from taking sets. */
-  private banned = false
+  score = 0
 
   /** If positive, number of ms the user will be blocked for after a wrong attempt. */
-  timeout!: number
+  timeout = 0
 
-  /** Number of collected Sets. */
-  get score(): number {
-    return this.sets.length
-  }
+  /** Activate when taking a set. */
+  readonly take = new SafeEmitter<CardSet>()
 
-  get isBanned(): boolean {
-    return this.banned
-  }
+  /** Sets taken from the Game. */
+  readonly takenCards: CardSet[] = []
 
-  /**
-   * If possible, move a set from the market to a player.
-   * If not, ban the player from taking any sets for `this.timeout`
-   * @returns true iff a set was taken.
-   */
-  takeSet(...cards: CardSet): boolean {
-    if (!this.banned) {
-      if (this.game.check(...cards)) {
-        const set = this.game.take(...cards)
-        this.sets.push(set)
-        this.game.marketGrab.activate(set)
-        return true
-      } else if (this.timeout) {
-        setTimeout(() => {
-          this.banned = false
-          this.game.playerUnbanned.activate(this)
-        }, this.timeout)
 
-        this.banned = true
-        this.bans++
-        this.game.playerBanned.activate({ player: this, timeout: this.timeout })
+  /** When taking a wrong set. */
+  readonly ban = new SafeEmitter<number>()
+
+  /** When ban is over. */
+  readonly unban = new SafeEmitter
+
+  /** Number of wrong attempts */
+  banCount = 0
+
+  /** Whether not timed out from taking sets. */
+  isBanned = false
+
+
+  /** When taking a wrong set. */
+  readonly hint = new SafeEmitter<Card>()
+
+  /** Cards which make up a set in the current market. */
+  readonly hintCards: Card[] = []
+
+  /** Number of times a hint used */
+  hintCount = 0
+
+  constructor(
+    /** 
+     * How long to ban a player for a wrong take.
+     * By default, no timeout for bans are ignored (But the emitters will still activate.)
+     */
+    nextTimeout = (player: Player) => 0,
+    /** How much to drop score due to a hint. (0 by default) */
+    nextHintCost = (player: Player) => 0,
+    /** How much to drop score due to a wrong take. (0 by default) */
+    nextBanCost = (player: Player) => 0,
+    /** How much to increase score due to a good take. (1 by default) */
+    nextSetValue = (player: Player) => 1,
+  ) {
+    // When taking a set
+    (async () => {
+      for await (let set of this.take) {
+        this.takenCards.push(set)
+        this.score += nextSetValue(this)
       }
-    }
-    return false
-  }
+    })();
 
-  /**
-   * Adds a new card to the `hint` property if possible.
-   * @returns true iff a new cards was added the the `hint` property.
-   */
-  getNewHint(): boolean {
-    const ungivenHints = this.game.solution.filter(card => !this.hint.includes(card))
-    if (ungivenHints.length) {
-      this.hints++
-      this.hint.push(ungivenHints[Math.floor(Math.random() * ungivenHints.length)])
-    }
-    return !!ungivenHints.length
+    // When being unbanned
+    (async () => {
+      for await (let _ of this.unban)
+        this.isBanned = false
+    })();
+
+    // When being banned
+    (async () => {
+      for await (let _ of this.ban) {
+        this.banCount++
+        this.score -= nextBanCost(this)
+        if (this.timeout) {
+          this.isBanned = true
+          setTimeout(this.unban.activate, this.timeout)
+          this.timeout = nextTimeout(this)
+        }
+      }
+    })();
+
+    // When getting a hint
+    (async () => {
+      for await (let card of this.hint) {
+        this.hintCards.push(card)
+        this.hintCount++
+        this.score -= nextHintCost(this)
+      }
+    })()
+
+    this.timeout = nextTimeout(this)
   }
 }
