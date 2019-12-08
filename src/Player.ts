@@ -1,7 +1,10 @@
-import { SafeEmitter } from 'fancy-emitter'
+import { SafeEmitter, merge } from 'fancy-emitter'
 import Card, { CardSet } from './Card.js'
 
-/** @readonly Represents the state of each player in the game. */
+/** 
+ * Represents the state of each player in the game. 
+ * @readonly The data here should only be modified or activated by the Game it is a part of.
+*/
 export default class Player {
   score = 0
 
@@ -13,7 +16,6 @@ export default class Player {
 
   /** Sets taken from the Game. */
   readonly takenCards: CardSet[] = []
-
 
   /** When taking a wrong set. */
   readonly ban = new SafeEmitter<number>()
@@ -27,9 +29,17 @@ export default class Player {
   /** Whether not timed out from taking sets. */
   isBanned = false
 
-
-  /** When taking a wrong set. */
+  /** When getting a card in a possible solution. */
   readonly hint = new SafeEmitter<Card>()
+
+  /** When the current hints are no longer useful. */
+  readonly hintClear = new SafeEmitter
+
+  /** When the hint changes in any way. */
+  readonly hintUpdate = merge({
+    hintAdd: this.hint,
+    hintClear: this.hintClear,
+  })
 
   /** Cards which make up a set in the current market. */
   readonly hintCards: Card[] = []
@@ -52,7 +62,7 @@ export default class Player {
   ) {
     // When taking a set
     (async () => {
-      for await (let set of this.take) {
+      for await (const set of this.take) {
         this.takenCards.push(set)
         this.score += nextSetValue(this)
       }
@@ -60,30 +70,36 @@ export default class Player {
 
     // When being unbanned
     (async () => {
-      for await (let _ of this.unban)
+      for await (const _ of this.unban)
         this.isBanned = false
     })();
 
     // When being banned
     (async () => {
-      for await (let _ of this.ban) {
+      for await (const oldTimeout of this.ban) {
         this.banCount++
         this.score -= nextBanCost(this)
         if (this.timeout) {
           this.isBanned = true
-          setTimeout(this.unban.activate, this.timeout)
           this.timeout = nextTimeout(this)
+          setTimeout(this.unban.activate, oldTimeout)
         }
       }
     })();
 
     // When getting a hint
     (async () => {
-      for await (let card of this.hint) {
+      for await (const card of this.hint) {
         this.hintCards.push(card)
         this.hintCount++
         this.score -= nextHintCost(this)
       }
+    })();
+
+    // When to clear current hints
+    (async () => {
+      for await (const _ of this.hintClear)
+        this.hintCards.length = 0
     })()
 
     this.timeout = nextTimeout(this)

@@ -1,7 +1,8 @@
 import 'should'
 import Card, { CardSet } from '../src/Card.js'
-import Market from '../src/Market.js'
 import { Quantity, Opacity, Shape, Color } from '../src/Details.js'
+import CardsWithoutSet from './helpers/CardsWithoutSet.js'
+import Game from '../src/Game.js'
 
 describe('Card', () => {
   it('details should match', done => {
@@ -80,10 +81,10 @@ describe('Card', () => {
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
-      ]
-      const market = new Market
-      market.pushCards(...cards as CardSet)
-      market.solution.should.not.be.false()
+      ],
+      game = new Game(undefined, undefined, cards)
+      
+      game.solution.should.not.be.false()
       done()
     })
 
@@ -92,10 +93,10 @@ describe('Card', () => {
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.GREEN, Shape.SQUARE, Quantity.TWO, Opacity.HALF),
         new Card(Color.RED, Shape.TRIANGLE, Quantity.THREE, Opacity.SOLID),
-      ]
-      const market = new Market
-      market.pushCards(...cards as CardSet)
-      market.solution.should.not.be.false()
+      ],
+      game = new Game(undefined, undefined, cards)
+      
+      game.solution.should.not.be.false()
       done()
     })
 
@@ -104,10 +105,10 @@ describe('Card', () => {
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.GREEN, Shape.CIRCLE, Quantity.TWO, Opacity.EMPTY),
         new Card(Color.RED, Shape.CIRCLE, Quantity.THREE, Opacity.EMPTY),
-      ]
-      const market = new Market
-      market.pushCards(...cards as CardSet)
-      market.solution.should.not.be.false()
+      ],
+      game = new Game(undefined, undefined, cards)
+      
+      game.solution.should.not.be.false()
       done()
     })
   })
@@ -119,10 +120,10 @@ describe('Card', () => {
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
         new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
-      ]
-      const market = new Market
-      market.pushCards(...cards as CardSet)
-      market.solution.should.be.false()
+      ],
+      game = new Game(undefined, undefined, cards)
+      
+      game.solution.should.be.false()
       done()
     })
 
@@ -130,10 +131,16 @@ describe('Card', () => {
       const cards = [
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
-      ]
-      const market = new Market
-      market.pushCards(...cards as CardSet)
-      market.solution.should.be.false()
+      ],
+      game = new Game(undefined, undefined, cards)
+      
+      game.solution.should.be.false()
+      done()
+    })
+
+    it('Should not make a set', done => {
+      const game = new Game(undefined, undefined, CardsWithoutSet)
+      game.solution.should.be.false()
       done()
     })
   })

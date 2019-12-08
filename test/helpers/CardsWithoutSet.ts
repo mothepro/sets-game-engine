@@ -1,29 +1,17 @@
-import 'should'
-import Card, { Details, CardSet } from '../../src/Card.js'
-import Market from '../../src/Market.js'
+import Card from '../../src/Card.js'
+import { Quantity, Opacity, Shape, Color } from '../../src/Details.js'
 
-const CardsWithoutSet: Card[] = [
-  new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-  new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.EMPTY),
-  new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
-  new Card(Details.Color.BLUE, Details.Shape.CIRCLE, Details.Quantity.ONE, Details.Opacity.SOLID),
-  new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
-  new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.THREE, Details.Opacity.SOLID),
-  new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.TWO, Details.Opacity.HALF),
-  new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.TWO, Details.Opacity.HALF),
-  new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.ONE, Details.Opacity.SOLID),
-  new Card(Details.Color.RED, Details.Shape.SQUARE, Details.Quantity.ONE, Details.Opacity.SOLID),
-  new Card(Details.Color.GREEN, Details.Shape.SQUARE, Details.Quantity.ONE, Details.Opacity.SOLID),
-  new Card(Details.Color.GREEN, Details.Shape.SQUARE, Details.Quantity.ONE, Details.Opacity.SOLID),
+export default [
+  new Card(Color.BLUE,  Shape.CIRCLE, Quantity.ONE,   Opacity.EMPTY),
+  new Card(Color.BLUE,  Shape.CIRCLE, Quantity.ONE,   Opacity.EMPTY),
+  new Card(Color.BLUE,  Shape.CIRCLE, Quantity.ONE,   Opacity.SOLID),
+  new Card(Color.BLUE,  Shape.CIRCLE, Quantity.ONE,   Opacity.SOLID),
+  new Card(Color.RED,   Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
+  new Card(Color.RED,   Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
+  new Card(Color.RED,   Shape.SQUARE, Quantity.TWO,   Opacity.HALF),
+  new Card(Color.RED,   Shape.SQUARE, Quantity.TWO,   Opacity.HALF),
+  new Card(Color.RED,   Shape.SQUARE, Quantity.ONE,   Opacity.SOLID),
+  new Card(Color.RED,   Shape.SQUARE, Quantity.ONE,   Opacity.SOLID),
+  new Card(Color.GREEN, Shape.SQUARE, Quantity.ONE,   Opacity.SOLID),
+  new Card(Color.GREEN, Shape.SQUARE, Quantity.ONE,   Opacity.SOLID),
 ]
-
-export default CardsWithoutSet
-
-describe('Test Helpers', () => {
-  it('Should not make a set', done => {
-    const market = new Market
-    market.pushCards(...CardsWithoutSet as CardSet)
-    market.solution.should.be.false()
-    done()
-  })
-})
