@@ -1,5 +1,4 @@
-import Card, { Details, CardSet } from './src/Card.js'
-import Game from './src/Game.js'
-import Player from './src/Player.js'
-
-export { Card, Game, Player, Details, CardSet }
+export { default as Details } from './src/Details.js'
+export { default as Card, CardSet } from './src/Card.js'
+export { default as Player } from './src/Player.js'
+export { default as Game } from './src/Game.js'

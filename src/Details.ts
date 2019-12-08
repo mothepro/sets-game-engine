@@ -28,4 +28,4 @@ export const SIZE = 3
 export const COUNT = 4
 
 /** Number of total different combinations of cards. */
-export const COMOBINATIONS = SIZE ** COUNT
+export const COMBINATIONS = SIZE ** COUNT
