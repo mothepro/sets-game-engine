@@ -82,7 +82,7 @@ describe('Card', () => {
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
       ],
-      game = new Game(undefined, undefined, cards)
+      game = new Game(undefined, cards)
       
       game.solution.should.not.be.false()
       done()
@@ -94,7 +94,7 @@ describe('Card', () => {
         new Card(Color.GREEN, Shape.SQUARE, Quantity.TWO, Opacity.HALF),
         new Card(Color.RED, Shape.TRIANGLE, Quantity.THREE, Opacity.SOLID),
       ],
-      game = new Game(undefined, undefined, cards)
+      game = new Game(undefined, cards)
       
       game.solution.should.not.be.false()
       done()
@@ -106,7 +106,7 @@ describe('Card', () => {
         new Card(Color.GREEN, Shape.CIRCLE, Quantity.TWO, Opacity.EMPTY),
         new Card(Color.RED, Shape.CIRCLE, Quantity.THREE, Opacity.EMPTY),
       ],
-      game = new Game(undefined, undefined, cards)
+      game = new Game(undefined, cards)
       
       game.solution.should.not.be.false()
       done()
@@ -121,7 +121,7 @@ describe('Card', () => {
         new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
         new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
       ],
-      game = new Game(undefined, undefined, cards)
+      game = new Game(undefined, cards)
       
       game.solution.should.be.false()
       done()
@@ -132,14 +132,14 @@ describe('Card', () => {
         new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
         new Card(Color.RED, Shape.SQUARE, Quantity.THREE, Opacity.SOLID),
       ],
-      game = new Game(undefined, undefined, cards)
+      game = new Game(undefined, cards)
       
       game.solution.should.be.false()
       done()
     })
 
     it('Should not make a set', done => {
-      const game = new Game(undefined, undefined, CardsWithoutSet)
+      const game = new Game(undefined, CardsWithoutSet)
       game.solution.should.be.false()
       done()
     })

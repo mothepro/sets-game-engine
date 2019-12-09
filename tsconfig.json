@@ -12,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "experimentalDecorators": true,
+    "experimentalDecorators": true
   },
   "exclude": ["dist/"]
 }

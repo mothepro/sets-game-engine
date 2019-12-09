@@ -50,21 +50,21 @@ export default class Player {
   constructor(
     /** 
      * How long to ban a player for a wrong take.
-     * By default, no timeout for bans are ignored (But the emitters will still activate.)
+     * By default, no timeout for bans (Emitters will still activate.)
      */
-    nextTimeout = (player: Player) => 0,
+    timeouts: Generator<number, never, Player> = function* () { while(true) yield 0 }(),
     /** How much to drop score due to a hint. (0 by default) */
-    nextHintCost = (player: Player) => 0,
+    hintCosts: Generator<number, never, Player> = function* () { while (true) yield 0 }(),
     /** How much to drop score due to a wrong take. (0 by default) */
-    nextBanCost = (player: Player) => 0,
+    banCosts: Generator<number, never, Player> = function* () { while (true) yield 0 }(),
     /** How much to increase score due to a good take. (1 by default) */
-    nextSetValue = (player: Player) => 1,
+    setValues: Generator<number, never, Player> = function* () { while (true) yield 1 }(),
   ) {
     // When taking a set
     (async () => {
       for await (const set of this.take) {
         this.takenCards.push(set)
-        this.score += nextSetValue(this)
+        this.score += setValues.next(this).value
       }
     })();
 
@@ -78,10 +78,10 @@ export default class Player {
     (async () => {
       for await (const oldTimeout of this.ban) {
         this.banCount++
-        this.score -= nextBanCost(this)
+        this.score -= banCosts.next(this).value
         if (this.timeout) {
           this.isBanned = true
-          this.timeout = nextTimeout(this)
+          this.timeout = timeouts.next(this).value
           setTimeout(this.unban.activate, oldTimeout)
         }
       }
@@ -92,7 +92,7 @@ export default class Player {
       for await (const card of this.hint) {
         this.hintCards.push(card)
         this.hintCount++
-        this.score -= nextHintCost(this)
+        this.score -= hintCosts.next(this).value
       }
     })();
 
@@ -102,6 +102,6 @@ export default class Player {
         this.hintCards.length = 0
     })()
 
-    this.timeout = nextTimeout(this)
+    this.timeout = timeouts.next(this).value
   }
 }

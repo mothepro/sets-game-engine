@@ -5,7 +5,7 @@ import asyncRunner from './helpers/asyncRunner.js'
 
 /** Keep taking this set, player should be banned eventually. */
 const keepTaking = (player: Player, game: Game) =>
-  setInterval(() => game.takeSet(player, ...game.playableCards.slice(0, 3) as CardSet), 10)
+  setInterval(() => game.takeSet(player, ...game.cards.slice(0, 3) as CardSet), 10)
 
 describe('Players', () => {
   it('should ban', done => {
@@ -25,7 +25,11 @@ describe('Players', () => {
     const expectedTimeouts = [1, 2, 4]
     let interval: NodeJS.Timer
 
-    const player = new Player((player) => player.timeout == 0 ? 1 : player.timeout * 2),
+    const player = new Player(function* () {
+      let currentPlayer = yield 1
+      while (true)
+        yield currentPlayer.timeout * 2
+    }()),
       game = new Game([player])
 
     return asyncRunner(
@@ -57,7 +61,7 @@ describe('Players', () => {
       ],
       player1 = new Player,
       player2 = new Player,
-      game = new Game([player1, player2], undefined, [
+      game = new Game([player1, player2], [
         ...set1,
         ...set2,
         ...CardsWithoutSet.slice(0, 3),
@@ -90,8 +94,7 @@ describe('Players', () => {
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
     ],
-      player = new Player,
-      game = new Game([player], undefined, [
+      game = new Game(undefined, [
         CardsWithoutSet[0],
         set[0],
         CardsWithoutSet[1],
@@ -100,13 +103,14 @@ describe('Players', () => {
         CardsWithoutSet[3],
         set[2],
         CardsWithoutSet[4],
-      ])
+      ]),
+      player = game.players[0]
 
     game.takeSet(player, CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
     await player.ban.next
 
     // valid, but banned
-    game.takeSet(player, ...set).should.be.false() 
+    game.takeSet(player, ...set).should.be.false()
     player.takenCards.should.have.size(0)
 
     await player.unban.next
@@ -124,7 +128,7 @@ describe('Players', () => {
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.SOLID),
     ],
       player = new Player,
-      game = new Game([player], undefined, [
+      game = new Game([player], [
         CardsWithoutSet[0],
         set[0],
         CardsWithoutSet[1],
@@ -151,7 +155,7 @@ describe('Players', () => {
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.SOLID),
     ],
       player = new Player,
-      game = new Game([player], undefined, [
+      game = new Game([player], [
         CardsWithoutSet[0],
         set[0],
         CardsWithoutSet[1],
