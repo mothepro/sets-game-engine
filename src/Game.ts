@@ -1,7 +1,6 @@
 import { SafeEmitter, SafeSingleEmitter } from 'fancy-emitter'
 import Player from './Player.js'
 import Card, { CardSet } from './Card.js'
-import allUniqueCards from './allUniqueCards.js'
 
 const isIterable = (arg: any): arg is Iterable<any> => Symbol.iterator in arg
 
@@ -60,7 +59,7 @@ export default class Game {
     /** Players in the game. */
     readonly players: Player[] = [new Player],
     /** All cards to use in the deck. */
-    deck: Iterable<Card> | Iterator<Card> = allUniqueCards()
+    deck: Iterable<Card> | Iterator<Card> = Card.randomAll()
   ) {
     // If an array is given, only go thru it once.
     this.deck = isIterable(deck)

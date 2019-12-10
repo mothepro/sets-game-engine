@@ -1,13 +1,13 @@
-import { Color, Shape, Quantity, Opacity, SIZE } from './Details.js'
+import { Color, Shape, Quantity, Opacity, SIZE, COMBINATIONS } from './Details.js'
 
 export type CardSet = [Card, Card, Card]
 
 export default class Card {
   constructor(
-    public readonly color: Color,
-    public readonly shape: Shape,
-    public readonly quantity: Quantity,
-    public readonly opacity: Opacity,
+    readonly color: Color,
+    readonly shape: Shape,
+    readonly quantity: Quantity,
+    readonly opacity: Opacity,
   ) { }
 
   /**
@@ -24,7 +24,7 @@ export default class Card {
   }
 
   /** Whether 3 cards make a valid set. */
-  public static isSet = (...cards: CardSet): boolean =>
+  static isSet = (...cards: CardSet): boolean =>
     1 == new Set([
       Card.diff(cards[0], cards[1]),
       Card.diff(cards[1], cards[2]),
@@ -35,13 +35,20 @@ export default class Card {
    * Build a Card using a single number as an encoding for Color, Shape, Quantity and Opacity.
    * @param encoding Number between 0 and `combinations`
    */
-  public static make = (encoding: number): Card =>
+  static make = (encoding: number): Card =>
     new Card(
       Math.trunc(encoding / SIZE ** 0) % SIZE as Color,
       Math.trunc(encoding / SIZE ** 1) % SIZE as Shape,
       Math.trunc(encoding / SIZE ** 2) % SIZE as Quantity,
       Math.trunc(encoding / SIZE ** 3) % SIZE as Opacity,
     )
+  
+  /** Generates each possible unique card in a random order. */
+  static *randomAll() {
+    const cards = [...Array(COMBINATIONS)].map((_, i) => Card.make(i))
+    while (cards.length)
+      yield cards.splice(Math.random() * cards.length, 1)[0]
+  }
 
   /** A unique value comparing the difference in the card's  */
   private static diff = (card1: Card, card2: Card): number =>
