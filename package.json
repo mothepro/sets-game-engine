@@ -4,7 +4,7 @@
   "description": "Sets the game engine.",
   "main": "dist/npm/index.js",
   "type": "module",
-  "module": "dis/esm/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
