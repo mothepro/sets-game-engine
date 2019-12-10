@@ -1,12 +1,14 @@
 {
   "name": "sets-game-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sets the game engine.",
   "main": "dist/npm/index.js",
   "type": "module",
   "module": "dis/esm/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build:npm": "tsc",
     "build:esm": "tsc -p tsconfig.esm.json",
