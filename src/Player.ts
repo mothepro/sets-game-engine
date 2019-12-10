@@ -1,10 +1,16 @@
 import { SafeEmitter, merge } from 'fancy-emitter'
 import Card, { CardSet } from './Card.js'
 
+/** Simple generator. */
+function* alwaysYield<T>(val: T): Generator<T, never, unknown> {
+  while (true)
+    yield val
+}
+
 /** 
  * Represents the state of each player in the game. 
  * @readonly The data here should only be modified or activated by the Game it is a part of.
-*/
+ */
 export default class Player {
   score = 0
 
@@ -52,18 +58,18 @@ export default class Player {
      * How long to ban a player for a wrong take.
      * By default, no timeout for bans (Emitters will still activate.)
      */
-    timeouts: Generator<number, never, Player> = function* () { while (true) yield 0 }(),
+    timeouts: Generator<number, never, Player> = alwaysYield(0),
     /** How much to drop score due to a hint. (0 by default) */
-    hintCosts: Generator<number, never, Player> = function* () { while (true) yield 0 }(),
+    hintCosts: Generator<number, never, Player> = alwaysYield(0),
     /** How much to drop score due to a wrong take. (0 by default) */
-    banCosts: Generator<number, never, Player> = function* () { while (true) yield 0 }(),
+    banCosts: Generator<number, never, Player> = alwaysYield(0),
     /** How much to increase score due to a good take. (1 by default) */
-    setValues: Generator<number, never, Player> = function* () { while (true) yield 1 }(),
+    scoreIncrementer: Generator<number, never, Player> = alwaysYield(1),
   ) {
     (async () => { // When taking a set
       for await (const set of this.take) {
         this.takenCards.push(set)
-        this.score += setValues.next(this).value
+        this.score += scoreIncrementer.next(this).value
       }
     })();
 
