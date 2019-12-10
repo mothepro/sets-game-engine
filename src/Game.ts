@@ -20,8 +20,8 @@ export default class Game {
   /** Activated when the market has new cards in it. */
   readonly filled = new SafeEmitter
 
-  /** The playable cards in the market. */
-  cards: Card[] = []
+  /** The market, including gaps and all */
+  private readonly market: Card[] = []
 
   get maxScore(): number {
     return this.players.reduce((maxScore, player) => Math.max(maxScore, player.score), 0)
@@ -39,17 +39,21 @@ export default class Game {
   get solution(): CardSet | false {
     if (this.lastSolution === undefined) {
       this.lastSolution = false
-      const cards = this.cards.filter(card => !!card) // clean version
-      if (cards.length >= 3)
-        for (let i = 0; i < cards.length - 2; i++)
-          for (let j = i + 1; j < cards.length - 1; j++)
-            for (let k = j + 1; k < cards.length; k++)
-              if (Card.isSet(cards[i], cards[j], cards[k])) {
-                this.lastSolution = [cards[i], cards[j], cards[k]]
+      if (this.cards.length >= 3)
+        for (let i = 0; i < this.cards.length - 2; i++)
+          for (let j = i + 1; j < this.cards.length - 1; j++)
+            for (let k = j + 1; k < this.cards.length; k++)
+              if (Card.isSet(this.cards[i], this.cards[j], this.cards[k])) {
+                this.lastSolution = [this.cards[i], this.cards[j], this.cards[k]]
                 break
               }
     }
     return this.lastSolution
+  }
+
+  /** The playable cards in the market. */
+  get cards(): readonly Card[] {
+    return this.market.filter(card => card instanceof Card)
   }
 
   constructor(
@@ -72,16 +76,15 @@ export default class Game {
    * @returns true iff a set was taken.
    */
   takeSet(player: Player, ...cards: CardSet): boolean {
-    for (const card of cards)
-      if (!this.cards.includes(card))
-        throw Error(`Card ${card} doesn't exist in the market.`)
+    if (cards.filter(x => !this.market.includes(x)).length)
+      throw Error(`Some of the following cards don't exist in the market: ${cards}`)
 
     if (!player.isBanned) {
       if (Card.isSet(...cards)) {
         delete this.lastSolution
         // Remove cards from market in place
         for (const card of cards)
-          delete this.cards[this.cards.indexOf(card)]
+          delete this.market[this.market.indexOf(card)]
         // Clear hints for all when market updates
         for (const player of this.players)
           player.hintClear.activate()
@@ -112,9 +115,6 @@ export default class Game {
   private prepareMarket(): void {
     this.fillMarket()
 
-    // Removes empty spots in market.
-    this.cards = this.cards.filter(card => card instanceof Card)
-
     // Game over if we can't find a solution
     if (this.solution)
       this.filled.activate()
@@ -125,7 +125,7 @@ export default class Game {
   /** Fill the market with cards from the deck. */
   private fillMarket() {
     // The market needs to reach the minimum AND have a solution
-    while (this.cards.filter(card => !!card).length < Game.MARKET_MINIMUM || !this.solution) {
+    while (this.cards.length < Game.MARKET_MINIMUM || !this.solution) {
       delete this.lastSolution // the last solution no longer means anything
 
       // Get the next cards from generator
@@ -143,8 +143,8 @@ export default class Game {
     let inPlaceInsersation = false
     for (const [index, spot] of this.cards.entries())
       if (spot == undefined)
-        return this.cards[index] = card
+        return this.market[index] = card
     if (!inPlaceInsersation)
-      this.cards.push(card)
+      this.market.push(card)
   }
 }
