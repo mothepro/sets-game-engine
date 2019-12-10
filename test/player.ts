@@ -6,7 +6,7 @@ import asyncRunner from './helpers/asyncRunner.js'
 
 /** Keep taking this set, player should be banned eventually. */
 const keepTaking = (player: Player, game: Game) =>
-  setInterval(() => game.takeSet(player, ...game.cards.slice(0, 3) as CardSet), 10)
+  setInterval(() => game.takeSet(player, game.cards.slice(0, 3) as CardSet), 10)
 
 describe('Players', () => {
   it('should ban', done => {
@@ -72,14 +72,14 @@ describe('Players', () => {
     game.winners.should.containEql(player1)
     game.winners.should.containEql(player2)
 
-    game.takeSet(player2, ...set1)
+    game.takeSet(player2, set1)
     await player2.take.next
 
     game.maxScore.should.eql(1)
     game.winners.should.have.size(1)
     game.winners.should.containEql(player2)
 
-    game.takeSet(player1, ...set2)
+    game.takeSet(player1, set2)
     await player1.take.next
 
     game.maxScore.should.eql(1)
@@ -109,15 +109,15 @@ describe('Players', () => {
         CardsWithoutSet[4],
       ])
 
-    game.takeSet(player, CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2]).should.be.false()
+    game.takeSet(player, CardsWithoutSet.slice(0, 3) as CardSet).should.be.false()
     await player.ban.next
 
     // valid, but banned
-    game.takeSet(player, ...set).should.be.false()
+    game.takeSet(player, set).should.be.false()
     player.takenCards.should.have.size(0)
 
     await player.unban.next
-    game.takeSet(player, ...set).should.be.true()
+    game.takeSet(player, set).should.be.true()
 
     await player.take.next
     player.takenCards.should.have.size(1)

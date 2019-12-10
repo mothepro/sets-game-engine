@@ -69,12 +69,14 @@ export default class Game {
   }
 
   /**
-   * If possible, move a set from tha.e market to a player.
-   * If not, ban the player from taking any sets for `this.timeout`.
+   * Attempts to take a set from the market on behalf of `player`.
+   * If the set is valid and player is not banned, remove the card from the market
+   * Clear all player's hints, activate the taker and prepare the next market.
+   * If the set is invalid, ban the player.
    * Throws if a given card doesn't exist in the market.
-   * @returns true iff a set was taken.
+   * @returns true iff a set was successfully taken.
    */
-  takeSet(player: Player, ...cards: CardSet): boolean {
+  takeSet(player: Player, cards: CardSet): boolean {
     if (cards.filter(x => !this.market.includes(x)).length)
       throw Error(`Some of the following cards don't exist in the market: ${cards}`)
 
@@ -94,6 +96,17 @@ export default class Game {
     }
     return false
   }
+
+  /**
+   * Attempts some indexs in the market on behalf of `player`.
+   * If the set is valid and player is not banned, remove the card from the market
+   * Clear all player's hints, activate the taker and prepare the next market.
+   * If the set is invalid, ban the player.
+   * Throws if a given market index doesn't have a card.
+   * @returns true iff a set was taken.
+   */
+  takeFromMarket = (player: Player, indexes: [number, number, number]) =>
+    this.takeSet(player, this.market.filter((_, index) => indexes.includes(index)) as CardSet)
 
   /**
    * Adds a new card to the `hint` property if possible.

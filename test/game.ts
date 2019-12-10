@@ -1,9 +1,9 @@
 import 'should'
-import Game, { Card } from '..'
+import Game, { Card, CardSet } from '..'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 
 describe('Game\'s Deck', () => {
-  it.only('Market should fill up normally', () => {
+  it('Market should fill up normally', () => {
     const game = new Game
 
     game.cards.length.should.be.oneOf(
@@ -31,7 +31,7 @@ describe('Game\'s Deck', () => {
       Card.make(1),
       Card.make(1),
       Card.make(1),
-    ] as const,
+    ] as CardSet,
       game = new Game(undefined, [
         CardsWithoutSet[0],
         set[0],
@@ -45,7 +45,7 @@ describe('Game\'s Deck', () => {
 
     game.cards.should.have.size(8)
 
-    game.takeSet(game.players[0], ...set).should.be.true()
+    game.takeSet(game.players[0], set).should.be.true()
     const takenSet = await game.players[0].take.next
 
     takenSet.should.eql(set)
