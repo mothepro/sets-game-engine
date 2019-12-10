@@ -49,7 +49,7 @@ describe('Players', () => {
     ).then(() => clearInterval(interval!))
   })
 
-  it('should get the winners', async done => {
+  it('should get the winners', async () => {
     const set1: CardSet = [
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
@@ -80,22 +80,25 @@ describe('Players', () => {
     game.winners.should.containEql(player2)
 
     game.takeSet(player1, ...set2)
-    await game.finished.event
+    await player1.take.next
 
     game.maxScore.should.eql(1)
     game.winners.should.have.size(2)
     game.winners.should.containEql(player1)
     game.winners.should.containEql(player2)
-    done()
+
+    await game.finished.event
   })
 
-  it('should not be able to play during ban', async done => {
+  it('should not be able to play during ban', async () => {
     const set: CardSet = [
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.EMPTY),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.HALF),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
     ],
-      game = new Game(undefined, [
+      // Player that gets banned for one tick
+      player = new Player(function*() { while(true) yield 1 }()),
+      game = new Game([player], [
         CardsWithoutSet[0],
         set[0],
         CardsWithoutSet[1],
@@ -104,10 +107,9 @@ describe('Players', () => {
         CardsWithoutSet[3],
         set[2],
         CardsWithoutSet[4],
-      ]),
-      player = game.players[0]
+      ])
 
-    game.takeSet(player, CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2])
+    game.takeSet(player, CardsWithoutSet[0], CardsWithoutSet[1], CardsWithoutSet[2]).should.be.false()
     await player.ban.next
 
     // valid, but banned
@@ -119,7 +121,6 @@ describe('Players', () => {
 
     await player.take.next
     player.takenCards.should.have.size(1)
-    done()
   })
 
   it('should give a single hint to player', async () => {
@@ -145,7 +146,6 @@ describe('Players', () => {
 
     game.takeHint(player).should.be.true()
     const nextHint = await player.hint.next
-    console.log('awaited')
     player.hintCount.should.eql(1)
     player.hintCards.should.have.size(1)
     nextHint.should.eql(player.hintCards[0])
@@ -171,19 +171,16 @@ describe('Players', () => {
       ])
 
     game.takeHint(player).should.be.true()
-    await player.hint.next
+    await player.hint.next // Must wait to guarantee the next hint gives a new hint
 
     game.takeHint(player).should.be.true()
-    await player.hint.next
+    await player.hint.next // Must wait to guarantee the next hint gives a new hint
 
     game.takeHint(player).should.be.true()
-    await player.hint.next
+    await player.hint.next // Must wait to guarantee the next hint gives a new hint
 
     game.takeHint(player).should.be.false()
-    await player.hint.next
-
     game.takeHint(player).should.be.false()
-    await player.hint.next
 
 
     player.hintCount.should.eql(3)
