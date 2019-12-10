@@ -3,16 +3,13 @@ import Game, { Card } from '..'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 
 describe('Game\'s Deck', () => {
-  const MARKET_SIZE = 9 // Default number of cards on screen
-  const MARKET_INC = 3  // Size of Set
-
-  it('Market should fill up normally', () => {
+  it.only('Market should fill up normally', () => {
     const game = new Game
 
     game.cards.length.should.be.oneOf(
-      MARKET_SIZE,
-      MARKET_SIZE + MARKET_INC,
-      MARKET_SIZE + MARKET_INC + MARKET_INC,
+      Game.MARKET_MINIMUM,
+      Game.MARKET_MINIMUM + Game.MARKET_INCREASE,
+      Game.MARKET_MINIMUM + Game.MARKET_INCREASE + Game.MARKET_INCREASE,
     )
     game.finished.triggered.should.be.false()
   })

@@ -80,7 +80,6 @@ export default class Game {
 
     if (!player.isBanned) {
       if (Card.isSet(...cards)) {
-        delete this.lastSolution
         // Remove cards from market in place
         for (const card of cards)
           delete this.market[this.market.indexOf(card)]
@@ -121,8 +120,9 @@ export default class Game {
       this.finished.activate()
   }
 
-  /** Fill the market with cards from the deck. */
+  /** Fill the market with cards from the deck. Clears the solution each time. */
   private fillMarket() {
+    delete this.lastSolution
     // The market needs to reach the minimum AND have a solution
     while (this.cards.length < Game.MARKET_MINIMUM || !this.solution) {
       // Get the next cards from generator
@@ -132,6 +132,7 @@ export default class Game {
           return
         this.pushMarket(value)
       }
+      delete this.lastSolution
     }
   }
 

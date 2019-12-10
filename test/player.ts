@@ -182,7 +182,6 @@ describe('Players', () => {
     game.takeHint(player).should.be.false()
     game.takeHint(player).should.be.false()
 
-
     player.hintCount.should.eql(3)
     player.hintCards.should.have.size(3)
     player.hintCards.should.containEql(set[0])
