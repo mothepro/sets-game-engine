@@ -27,7 +27,6 @@
     "@types/mocha": "^2.2.48",
     "@types/node": "^12.12.14",
     "@types/should": "^13.0.0",
-    "@types/shuffle-array": "0.0.28",
     "mocha": "^5.0.0",
     "should": "^13.2.1",
     "typescript": "^3.7.3"

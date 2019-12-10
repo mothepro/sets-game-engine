@@ -1,5 +1,6 @@
+import 'should'
+import Game, { Card, CardSet, Player } from '..'
 import { Color, Quantity, Shape, Opacity } from '../src/Details'
-import { Card, CardSet, Player, Game } from '..'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 import asyncRunner from './helpers/asyncRunner.js'
 

@@ -1,5 +1,5 @@
 import 'should'
-import { Card, Game } from '..'
+import Game, { Card } from '..'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 
 describe('Game\'s Deck', () => {
@@ -9,7 +9,7 @@ describe('Game\'s Deck', () => {
   it('Market should fill up normally', () => {
     const game = new Game
 
-    game.playableCards.length.should.be.oneOf(
+    game.cards.length.should.be.oneOf(
       MARKET_SIZE,
       MARKET_SIZE + MARKET_INC,
       MARKET_SIZE + MARKET_INC + MARKET_INC,
@@ -19,13 +19,13 @@ describe('Game\'s Deck', () => {
 
   it('Market should fill up all the way because a set can\'t be made', () => {
     const shouldBeImmutable = CardsWithoutSet.length
-    const game = new Game(undefined, undefined, CardsWithoutSet)
-    game.playableCards.should.have.size(shouldBeImmutable)
+    const game = new Game(undefined, CardsWithoutSet)
+    game.cards.should.have.size(shouldBeImmutable)
     game.finished.triggered.should.be.true()
   })
 
   it('Deck should be complete', () => {
-    const game = new Game(undefined, undefined, [])
+    const game = new Game(undefined, [])
     game.finished.triggered.should.be.true()
   })
 
@@ -35,7 +35,7 @@ describe('Game\'s Deck', () => {
       Card.make(1),
       Card.make(1),
     ] as const,
-      game = new Game(undefined, undefined, [
+      game = new Game(undefined, [
         CardsWithoutSet[0],
         set[0],
         CardsWithoutSet[1],
@@ -46,7 +46,7 @@ describe('Game\'s Deck', () => {
         CardsWithoutSet[4],
       ])
 
-    game.playableCards.should.have.size(8)
+    game.cards.should.have.size(8)
 
     game.takeSet(game.players[0], ...set).should.be.true()
 
@@ -54,7 +54,7 @@ describe('Game\'s Deck', () => {
 
     game.players[0].take.on(cards => {
       cards.should.eql(set)
-      game.playableCards.should.have.size(5)
+      game.cards.should.have.size(5)
       game.finished.triggered.should.be.true()
       done()
     })
