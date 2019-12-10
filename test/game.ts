@@ -29,7 +29,7 @@ describe('Game\'s Deck', () => {
     game.finished.triggered.should.be.true()
   })
 
-  it('Should remove cards and keep order', done => {
+  it('Should remove cards and keep order', async () => {
     const set = [
       Card.make(1),
       Card.make(1),
@@ -49,14 +49,10 @@ describe('Game\'s Deck', () => {
     game.cards.should.have.size(8)
 
     game.takeSet(game.players[0], ...set).should.be.true()
+    const takenSet = await game.players[0].take.next
 
-
-
-    game.players[0].take.on(cards => {
-      cards.should.eql(set)
-      game.cards.should.have.size(5)
-      game.finished.triggered.should.be.true()
-      done()
-    })
+    takenSet.should.eql(set)
+    game.cards.should.have.size(5)
+    game.finished.triggered.should.be.true()
   })
 })

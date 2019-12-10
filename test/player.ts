@@ -122,7 +122,7 @@ describe('Players', () => {
     done()
   })
 
-  it('should give a single hint to player', () => {
+  it('should give a single hint to player', async () => {
     const set: CardSet = [
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.EMPTY),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.HALF),
@@ -143,13 +143,16 @@ describe('Players', () => {
     player.hintCount.should.eql(0)
     player.hintCards.should.be.empty()
 
-    game.getNewHint(player).should.be.true()
+    game.takeHint(player).should.be.true()
+    const nextHint = await player.hint.next
+    console.log('awaited')
     player.hintCount.should.eql(1)
     player.hintCards.should.have.size(1)
-    player.hintCards[0].should.equalOneOf(set)
+    nextHint.should.eql(player.hintCards[0])
+    nextHint.should.equalOneOf(set)
   })
 
-  it('should give all hints to player', () => {
+  it('should give all hints to player', async () => {
     const set: CardSet = [
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.EMPTY),
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.TWO, Opacity.HALF),
@@ -167,11 +170,21 @@ describe('Players', () => {
         CardsWithoutSet[4],
       ])
 
-    game.getNewHint(player).should.be.true()
-    game.getNewHint(player).should.be.true()
-    game.getNewHint(player).should.be.true()
-    game.getNewHint(player).should.be.false()
-    game.getNewHint(player).should.be.false()
+    game.takeHint(player).should.be.true()
+    await player.hint.next
+
+    game.takeHint(player).should.be.true()
+    await player.hint.next
+
+    game.takeHint(player).should.be.true()
+    await player.hint.next
+
+    game.takeHint(player).should.be.false()
+    await player.hint.next
+
+    game.takeHint(player).should.be.false()
+    await player.hint.next
+
 
     player.hintCount.should.eql(3)
     player.hintCards.should.have.size(3)

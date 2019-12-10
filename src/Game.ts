@@ -101,7 +101,7 @@ export default class Game {
    * Adds a new card to the `hint` property if possible.
    * @returns true iff a new cards was added the the `hint` property.
    */
-  getNewHint(player: Player): boolean {
+  takeHint(player: Player): boolean {
     if (this.solution) {
       const ungivenHints = this.solution.filter(card => !player.hintCards.includes(card))
       if (ungivenHints.length)
@@ -126,8 +126,6 @@ export default class Game {
   private fillMarket() {
     // The market needs to reach the minimum AND have a solution
     while (this.cards.length < Game.MARKET_MINIMUM || !this.solution) {
-      delete this.lastSolution // the last solution no longer means anything
-
       // Get the next cards from generator
       for (let i = 0; i < Game.MARKET_INCREASE; i++) {
         const { value, done } = this.deck.next()
