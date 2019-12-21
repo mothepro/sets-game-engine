@@ -606,10 +606,10 @@ external-editor@^3.0.3:
     iconv-lite "^0.4.24"
     tmp "^0.0.33"
 
-fancy-emitter@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/fancy-emitter/-/fancy-emitter-1.3.0.tgz#aaad18d8dd09afbb27c46057a07b45651c952cfd"
-  integrity sha512-d2uRguljXKWMhjZCTMFPqkAH4MtXxB6WJ8CQ/xJ0gYp4F1enleSLsGGcOyCugWzi87n0RxXkuwH9mK474NrfVQ==
+fancy-emitter@1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/fancy-emitter/-/fancy-emitter-1.3.1.tgz#d1faf883774d1809e03cc98f9aee317f987d2a16"
+  integrity sha512-WBIzj9zGNMkteSil6uKAmJmLV4PHirAHlSvlbhBACgN4hqHRCETtnffyb/XJM0TD/xfDyvFrjnymjc9c3HBl3g==
 
 figures@^1.7.0:
   version "1.7.0"
