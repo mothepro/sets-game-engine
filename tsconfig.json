@@ -14,5 +14,6 @@
     "moduleResolution": "node",
     "experimentalDecorators": true
   },
-  "exclude": ["dist/"]
+  "include": ["src", "index"],
+  "exclude": ["dist"]
 }
