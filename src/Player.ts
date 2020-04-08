@@ -28,7 +28,6 @@ export default class Player {
 
   /** When taking a wrong set. */
   readonly ban = new SafeEmitter<number>(() => {
-    this.banCount++
     this.score -= this.banCosts.next(this).value
     if (this.timeout) {
       this.isBanned = true
@@ -40,16 +39,12 @@ export default class Player {
   /** When ban is over. */
   readonly unban = new SafeEmitter(() => this.isBanned = false)
 
-  /** Number of wrong attempts */
-  banCount = 0
-
   /** Whether not timed out from taking sets. */
   isBanned = false
 
   /** When getting a card in a possible solution. */
   readonly hint = new SafeEmitter<Card>(card => {
     this.hintCards.push(card)
-    this.hintCount++
     this.score -= this.hintCosts.next(this).value
   })
 
@@ -64,9 +59,6 @@ export default class Player {
 
   /** Cards which make up a set in the current market. */
   readonly hintCards: Card[] = []
-
-  /** Number of times a hint used */
-  hintCount = 0
 
   constructor(
     /** 

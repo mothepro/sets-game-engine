@@ -14,7 +14,7 @@ describe('Players', () => {
       game = new Game([player])
 
     player.ban.on(() => {
-      player.banCount.should.eql(1)
+      player.ban.count.should.eql(1)
       clearInterval(interval)
       done()
     })
@@ -138,12 +138,12 @@ describe('Players', () => {
         CardsWithoutSet[4],
       ])
 
-    player.hintCount.should.eql(0)
+    player.hint.count.should.eql(0)
     player.hintCards.should.be.empty()
 
     game.takeHint(player).should.be.true()
     const nextHint = await player.hint.next
-    player.hintCount.should.eql(1)
+    player.hint.count.should.eql(1)
     player.hintCards.should.have.size(1)
     nextHint.should.eql(player.hintCards[0])
     nextHint.should.equalOneOf(set)
@@ -179,7 +179,7 @@ describe('Players', () => {
     game.takeHint(player).should.be.false()
     game.takeHint(player).should.be.false()
 
-    player.hintCount.should.eql(3)
+    player.hint.count.should.eql(3)
     player.hintCards.should.have.size(3)
     player.hintCards.should.containEql(set[0])
     player.hintCards.should.containEql(set[1])
