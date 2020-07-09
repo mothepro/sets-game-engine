@@ -32,8 +32,8 @@ export default class Player {
     if (this.timeout) {
       this.isBanned = true
       setTimeout(this.unban.activate, this.timeout)
-      this.timeout = this.timeouts.next(this).value
     }
+    this.timeout = this.timeouts.next(this).value
   })
 
   /** When ban is over. */
