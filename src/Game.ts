@@ -1,4 +1,4 @@
-import { SafeEmitter, SafeSingleEmitter } from 'fancy-emitter'
+import { Emitter } from 'fancy-emitter'
 import Player from './Player.js'
 import Card, { CardSet } from './Card.js'
 
@@ -13,11 +13,8 @@ export default class Game {
 
   protected readonly deck: Iterator<Card>
 
-  /** Activated once the game is completed. */
-  readonly finished = new SafeSingleEmitter
-
-  /** Activated when the market has new cards in it. */
-  readonly filled = new SafeEmitter
+  /** Activated when the market has new cards in it. Cancelled once the game is done. */
+  readonly filled = new Emitter
 
   /** The market, including gaps and all */
   private readonly market: Card[] = []
@@ -130,7 +127,7 @@ export default class Game {
     if (this.solution)
       this.filled.activate()
     else
-      this.finished.activate()
+      this.filled.cancel()
   }
 
   /** Fill the market with cards from the deck. Clears the solution each time. */

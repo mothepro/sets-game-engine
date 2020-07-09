@@ -9,21 +9,24 @@ describe('Game\'s Deck', () => {
     game.cards.length.should.be.oneOf(
       Game.MARKET_MINIMUM,
       Game.MARKET_MINIMUM + Game.MARKET_INCREASE,
-      Game.MARKET_MINIMUM + Game.MARKET_INCREASE + Game.MARKET_INCREASE,
-    )
-    game.finished.triggered.should.be.false()
+      Game.MARKET_MINIMUM + Game.MARKET_INCREASE + Game.MARKET_INCREASE)
+    
+    game.filled.isAlive.should.be.true()
   })
 
   it('Market should fill up all the way because a set can\'t be made', () => {
     const shouldBeImmutable = CardsWithoutSet.length
+
     const game = new Game(undefined, CardsWithoutSet)
+
     game.cards.should.have.size(shouldBeImmutable)
-    game.finished.triggered.should.be.true()
+    game.filled.isAlive.should.be.false()
   })
 
   it('Deck should be complete', () => {
     const game = new Game(undefined, [])
-    game.finished.triggered.should.be.true()
+
+    game.filled.isAlive.should.be.false()
   })
 
   it('Should remove cards and keep order', async () => {
@@ -50,6 +53,6 @@ describe('Game\'s Deck', () => {
 
     takenSet.should.eql(set)
     game.cards.should.have.size(5)
-    game.finished.triggered.should.be.true()
+    game.filled.isAlive.should.be.false()
   })
 })

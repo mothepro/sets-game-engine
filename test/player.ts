@@ -87,7 +87,7 @@ describe('Players', () => {
     game.winners.should.containEql(player1)
     game.winners.should.containEql(player2)
 
-    await game.finished.event
+    game.filled.isAlive.should.be.false()
   })
 
   it('should not be able to play during ban', async () => {
