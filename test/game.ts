@@ -1,5 +1,5 @@
 import 'should'
-import Game, { Card, CardSet } from '..'
+import Game, { Card, CardSet } from '../index'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 
 describe('Game\'s Deck', () => {

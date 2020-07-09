@@ -1,5 +1,5 @@
 import 'should'
-import Game, { Card, CardSet, Player } from '..'
+import Game, { Card, CardSet, Player } from '../index'
 import { Color, Quantity, Shape, Opacity } from '../src/Details'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 import asyncRunner from './helpers/asyncRunner.js'
@@ -14,7 +14,7 @@ describe('Players', () => {
       game = new Game([player])
 
     player.ban.on(() => {
-      player.banCount.should.eql(1)
+      player.ban.count.should.eql(1)
       clearInterval(interval)
       done()
     })
@@ -69,23 +69,20 @@ describe('Players', () => {
       ])
 
     game.maxScore.should.eql(0)
-    game.winners.should.containEql(player1)
-    game.winners.should.containEql(player2)
+    game.winners.should.have.size(2)
 
     game.takeSet(player2, set1)
     await player2.take.next
 
     game.maxScore.should.eql(1)
     game.winners.should.have.size(1)
-    game.winners.should.containEql(player2)
+    game.winners[0].should.eql(player2)
 
     game.takeSet(player1, set2)
     await player1.take.next
 
     game.maxScore.should.eql(1)
     game.winners.should.have.size(2)
-    game.winners.should.containEql(player1)
-    game.winners.should.containEql(player2)
 
     game.filled.isAlive.should.be.false()
   })
@@ -97,7 +94,7 @@ describe('Players', () => {
       new Card(Color.BLUE, Shape.CIRCLE, Quantity.ONE, Opacity.SOLID),
     ],
       // Player that gets banned for one tick
-      player = new Player(function*() { while(true) yield 1 }()),
+      player = new Player(function* () { while (true) yield 1 }()),
       game = new Game([player], [
         CardsWithoutSet[0],
         set[0],
@@ -141,12 +138,12 @@ describe('Players', () => {
         CardsWithoutSet[4],
       ])
 
-    player.hintCount.should.eql(0)
+    player.hint.count.should.eql(0)
     player.hintCards.should.be.empty()
 
     game.takeHint(player).should.be.true()
     const nextHint = await player.hint.next
-    player.hintCount.should.eql(1)
+    player.hint.count.should.eql(1)
     player.hintCards.should.have.size(1)
     nextHint.should.eql(player.hintCards[0])
     nextHint.should.equalOneOf(set)
@@ -182,7 +179,7 @@ describe('Players', () => {
     game.takeHint(player).should.be.false()
     game.takeHint(player).should.be.false()
 
-    player.hintCount.should.eql(3)
+    player.hint.count.should.eql(3)
     player.hintCards.should.have.size(3)
     player.hintCards.should.containEql(set[0])
     player.hintCards.should.containEql(set[1])

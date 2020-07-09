@@ -2,7 +2,7 @@ import { Emitter } from 'fancy-emitter'
 import Player from './Player.js'
 import Card, { CardSet } from './Card.js'
 
-const isIterable = (arg: any): arg is Iterable<any> => Symbol.iterator in arg
+const isIterable = (arg: any): arg is Iterable<any> => arg && Symbol.iterator in arg
 
 export default class Game {
   static readonly MARKET_MINIMUM = 9

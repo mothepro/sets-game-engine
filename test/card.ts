@@ -1,5 +1,5 @@
 import 'should'
-import Game, { Card } from '..'
+import Game, { Card } from '../index'
 import { Quantity, Opacity, Shape, Color } from '../src/Details.js'
 import CardsWithoutSet from './helpers/CardsWithoutSet.js'
 

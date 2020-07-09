@@ -4,6 +4,7 @@
     "target": "es2019",
     "strict": true,
     "sourceMap": true,
+    "inlineSources": true,
     "outDir": "dist/npm",
     "declaration": true,
     "lib": ["esnext"],
@@ -14,5 +15,5 @@
     "moduleResolution": "node",
     "experimentalDecorators": true
   },
-  "exclude": ["dist/"]
+  "exclude": ["dist"]
 }
