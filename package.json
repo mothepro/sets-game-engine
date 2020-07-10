@@ -1,6 +1,6 @@
 {
   "name": "sets-game-engine",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Sets the game engine.",
   "main": "dist/npm/index.js",
   "module": "dist/esm/index.js",
