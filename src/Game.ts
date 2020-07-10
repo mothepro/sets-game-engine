@@ -148,11 +148,9 @@ export default class Game {
 
   /** Add a card to the market. Fill empty slots first, otherwise just push at end. */
   private pushMarket(card: Card) {
-    let inPlaceInsersation = false
-    for (const [index, spot] of this.cards.entries())
+    for (const [index, spot] of this.market.entries())
       if (spot == undefined)
         return this.market[index] = card
-    if (!inPlaceInsersation)
-      this.market.push(card)
+    this.market.push(card)
   }
 }

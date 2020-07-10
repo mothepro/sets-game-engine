@@ -10,7 +10,7 @@ describe('Game\'s Deck', () => {
       Game.MARKET_MINIMUM,
       Game.MARKET_MINIMUM + Game.MARKET_INCREASE,
       Game.MARKET_MINIMUM + Game.MARKET_INCREASE + Game.MARKET_INCREASE)
-    
+
     game.filled.isAlive.should.be.true()
   })
 
@@ -29,7 +29,7 @@ describe('Game\'s Deck', () => {
     game.filled.isAlive.should.be.false()
   })
 
-  it('Should remove cards and keep order', async () => {
+  it('Should remove cards and end game', async () => {
     const set = [
       Card.make(1),
       Card.make(1),
@@ -54,5 +54,46 @@ describe('Game\'s Deck', () => {
     takenSet.should.eql(set)
     game.cards.should.have.size(5)
     game.filled.isAlive.should.be.false()
+  })
+
+  it('Should remove cards and keep order', async () => {
+    const set = [
+      Card.make(1),
+      Card.make(1),
+      Card.make(1),
+    ] as CardSet,
+      set2 = [
+        Card.make(2),
+        Card.make(2),
+        Card.make(2),
+      ] as CardSet,
+      game = new Game(undefined, [
+        CardsWithoutSet[0],
+        set[0],
+        CardsWithoutSet[1],
+        set[1],
+        CardsWithoutSet[2],
+        CardsWithoutSet[3],
+        set[2],
+        CardsWithoutSet[4],
+        CardsWithoutSet[5],
+
+        // Refilled set
+        set2[0],
+        set2[1],
+        set2[2],
+      ])
+
+    game.cards.should.have.size(9)
+    await game.filled.next
+
+    game.takeSet(game.players[0], set)
+    await game.filled.next
+
+    game.filled.isAlive.should.be.true()
+    game.filled.count.should.eql(2)
+    game.cards[1].should.eql(set2[0])
+    game.cards[3].should.eql(set2[1])
+    game.cards[6].should.eql(set2[2])
   })
 })
