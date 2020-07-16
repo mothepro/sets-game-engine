@@ -103,7 +103,7 @@ export default class Game {
    * @returns true iff a set was taken.
    */
   takeFromMarket = (player: Player, indexes: [number, number, number]) =>
-    this.takeSet(player, this.market.filter((_, index) => indexes.includes(index)) as CardSet)
+    this.takeSet(player, this.cards.filter((_, index) => indexes.includes(index)) as CardSet)
 
   /**
    * Adds a new card to the `hint` property if possible.
@@ -149,7 +149,7 @@ export default class Game {
   /** Add a card to the market. Fill empty slots first, otherwise just push at end. */
   private pushMarket(card: Card) {
     for (const [index, spot] of this.market.entries())
-      if (spot == undefined)
+      if (!spot)
         return this.market[index] = card
     this.market.push(card)
   }
